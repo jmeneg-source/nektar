@@ -1,0 +1,42 @@
+\tdplotsetmaincoords{70}{20}
+
+\begin{tikzpicture}[line join=bevel,tdplot_main_coords,scale=2,>=latex]
+  \coordinate (A) at (-1,-1,-1);
+  \coordinate (B) at ( 1,-1,-1);
+  \coordinate (C) at ( 1, 1,-1);
+  \coordinate (D) at (-1, 1,-1);
+  \coordinate (E) at (0, 0, 1);
+
+  \coordinate (AB1) at (-0.33, -1, -1);
+  \coordinate (AB2) at (0.33, -1, -1);
+  \coordinate (AE1) at (-0.67,-0.67, -0.33);
+  \coordinate (AE2) at (-0.33,-0.33, 0.33);
+  \coordinate (BE1) at (0.67,-0.67, -0.33);
+  \coordinate (BE2) at (0.33,-0.33, 0.33);
+
+  \coordinate (BC1) at (1, -0.33, -1);
+  \coordinate (BC2) at (1, 0.33, -1);
+  \coordinate (CE1) at ( 0.67, 0.67, -0.33);
+  \coordinate (CE2) at ( 0.33, 0.33, 0.33);
+  
+  \begin{scope}[blend mode=multiply]
+    \fill[red!30,fill opacity=0.3] (A) -- (B) -- (E) -- cycle;
+    \fill[red!30,fill opacity=0.3] (B) -- (C) -- (E) -- cycle;
+  \end{scope}
+  
+  \draw (A) -- (B) -- (E) -- cycle;
+  \draw (B) -- (C) -- (E) -- cycle;
+  \draw[dashed,opacity=0.5] (C) -- (D) -- (A);
+  \draw[dashed,opacity=0.5] (D) -- (E);
+
+   \draw [red!100](AB1) -- (E);
+   \draw [red!100](AB2) -- (E);
+   \draw [red!100](AE1) -- (BE1);
+   \draw [red!100](AE2) -- (BE2);
+
+   \draw [red!100](BC1) -- (BE1);
+   \draw [red!100](BC2) -- (BE2);
+   \draw [red!100](CE1) -- (B);
+   \draw [red!100](CE2) -- (B);
+  
+\end{tikzpicture}

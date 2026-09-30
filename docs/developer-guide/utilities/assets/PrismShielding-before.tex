@@ -1,0 +1,25 @@
+\tdplotsetmaincoords{70}{-30}
+
+\begin{tikzpicture}[line join=bevel,tdplot_main_coords,scale=2,>=latex]
+  \coordinate (A) at (-2,-1,-1);
+  \coordinate (B) at ( 2,-1,-1);
+  \coordinate (C) at ( 2, 1,-1);
+  \coordinate (D) at (-2, 1,-1);
+  \coordinate (E) at (-2, 0, 1);
+  \coordinate (F) at (2, 0, 1);
+  
+  \begin{scope}[blend mode=multiply]
+    % \fill[black!30,fill opacity=0.3] (A) -- (B) -- (F) -- (E) -- cycle;
+    % \fill[black!30,fill opacity=0.3] (D) -- (C) -- (F) -- (E) -- cycle;
+    \fill[black!30,fill opacity=0.3] (A) -- (B) -- (C) -- (D) -- cycle;
+    \fill[black!30,fill opacity=0.3] (A) -- (D) -- (E) -- cycle;
+    \fill[black!30,fill opacity=0.3] (B) -- (C) -- (F) -- cycle;
+  \end{scope}
+  
+  \draw[dashed,opacity=0.5] (A) -- (B) -- (F) -- (E) -- cycle;
+  \draw[dashed,opacity=0.5] (E) -- (D) -- (C) -- (F);
+  \draw[dashed,opacity=0.5] (A) -- (D);
+  \draw[dashed,opacity=0.5] (B) -- (C);
+  
+\end{tikzpicture}
+

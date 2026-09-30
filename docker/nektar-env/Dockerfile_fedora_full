@@ -1,0 +1,20 @@
+FROM %%REGISTRY%%:env-%%OS_DISTRO%%-%%OS_VERSION%%-default
+
+LABEL maintainer="Nektar++ Development Team <nektar-users@imperial.ac.uk>"
+
+USER root
+COPY docker/nektar-env/fedora${FEDORA_VERSION}_full_packages.txt packages.txt
+
+RUN	yum install -y $(cat packages.txt) \
+	&& yum clean all
+
+# mpich installs to a non-standard location on fedora
+# below env vars added to help out cmake
+ENV LD_LIBRARY_PATH /usr/lib64/mpich/lib:LD_LIBRARY_PATH
+ENV LIBRARY_PATH /usr/lib64/mpich/lib:$LIBRARY_PATH
+ENV PATH /usr/lib64/mpich/bin:$PATH
+ENV PKG_CONFIG_PATH /usr/lib64/mpich/lib/pkgconfig:$PKG_CONFIG_PATH
+
+RUN pip install myokit
+
+USER nektar:nektar

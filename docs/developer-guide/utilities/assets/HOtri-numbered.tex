@@ -1,0 +1,51 @@
+\newcommand{\nodeLabel}[3]{
+    \node[color=#3, fill=white, opacity=0.9] at (#1) {\fontsize{10}{10}\selectfont #2}
+}
+
+\begin{tikzpicture}[line join=bevel,scale=2,>=latex]
+  \coordinate (n0) at (-1,-1);
+  \coordinate (n1) at (1,-1);
+  \coordinate (n2) at (-1,1);
+
+  \coordinate (n3) at (-0.5, -1);
+  \coordinate (n4) at (0, -1);
+  \coordinate (n5) at (0.5, -1);
+
+  \coordinate (n6) at (0.5, -0.5);
+  \coordinate (n7) at (0, 0);
+  \coordinate (n8) at (-0.5, 0.5);
+
+  \coordinate (n9) at (-1, 0.5);
+  \coordinate (n10) at (-1, 0);
+  \coordinate (n11) at (-1, -0.5);
+
+  \coordinate (n12) at (-0.5, -0.5);
+  \coordinate (n13) at (0, -0.5);
+  \coordinate (n14) at (-0.5, 0);  
+  
+  \draw[thick] (n0) -- (n1) -- (n2) -- cycle;
+  \draw[dashed,opacity=0.5] (n3) -- (n8);
+  \draw[dashed,opacity=0.5] (n4) -- (n7);
+  \draw[dashed,opacity=0.5] (n5) -- (n6);
+  \draw[dashed,opacity=0.5] (n11) -- (n6);
+  \draw[dashed,opacity=0.5] (n10) -- (n7);
+  \draw[dashed,opacity=0.5] (n9) -- (n8);
+
+  \nodeLabel{n0}{0 }{black};
+  \nodeLabel{n1}{1 }{black};
+  \nodeLabel{n2}{2 }{black};
+  \nodeLabel{n3}{3 }{red};
+  \nodeLabel{n4}{4 }{red};
+  \nodeLabel{n5}{5 }{red};
+  \nodeLabel{n6}{6 }{red};
+  \nodeLabel{n7}{7 }{red};
+  \nodeLabel{n8}{8 }{red};
+  \nodeLabel{n9}{9 }{red};
+  \nodeLabel{n10}{10}{red};
+  \nodeLabel{n11}{11}{red};
+  \nodeLabel{n12}{12}{blue};
+  \nodeLabel{n13}{13}{blue};
+  \nodeLabel{n14}{14}{blue};
+
+
+\end{tikzpicture}

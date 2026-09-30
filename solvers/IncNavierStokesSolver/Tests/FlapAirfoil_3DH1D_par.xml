@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<NEKTAR>
+    <EXPANSIONS>
+        <E COMPOSITE="C[5]" NUMMODES="3, 3" BASISTYPE="Modified_A,Modified_A" POINTSTYPE="GaussLobattoLegendre,GaussLobattoLegendre"   NUMPOINTS="4,4" FIELDS="u,v,w" />
+        <E COMPOSITE="C[5]" NUMMODES="2, 2" BASISTYPE="Modified_A,Modified_A" POINTSTYPE="GaussLobattoLegendre,GaussLobattoLegendre"   NUMPOINTS="4,4" FIELDS="p" />
+        <E COMPOSITE="C[6]" NUMMODES="3, 3" BASISTYPE="Modified_A,Modified_B" POINTSTYPE="GaussLobattoLegendre,GaussRadauMAlpha1Beta0" NUMPOINTS="4,3" FIELDS="u,v,w" />
+        <E COMPOSITE="C[6]" NUMMODES="2, 2" BASISTYPE="Modified_A,Modified_B" POINTSTYPE="GaussLobattoLegendre,GaussRadauMAlpha1Beta0" NUMPOINTS="4,3" FIELDS="p" />
+    </EXPANSIONS>
+    <CONDITIONS>
+        <SOLVERINFO>
+            <I PROPERTY="SolverType"                    VALUE="VCSFSI" />
+            <I PROPERTY="EQTYPE"                        VALUE="UnsteadyNavierStokes"     />
+            <I PROPERTY="EvolutionOperator"             VALUE="Nonlinear"                />
+            <I PROPERTY="Projection"                    VALUE="Continuous"                 />
+            <I PROPERTY="GlobalSysSoln"                 VALUE="XxtMultiLevelStaticCond"  />
+            <I PROPERTY="Driver"                        VALUE="Standard"                 />
+            <I PROPERTY="SpectralVanishingViscositySpectralHP"    VALUE="DGKernel" />
+            <I PROPERTY="HOMOGENEOUS"                   VALUE="1D"                       />
+        </SOLVERINFO>
+
+        <TIMEINTEGRATIONSCHEME>
+            <METHOD> IMEX </METHOD>
+            <ORDER> 2 </ORDER>
+        </TIMEINTEGRATIONSCHEME>
+
+        <PARAMETERS>
+            <P> Re            = 400.                </P>
+            <P> freq          = 1/PI </P>
+            <P> amp           = 0.25                </P>
+            <P> phase0        = 0.1                </P>
+            <P> NperT         = 20000  </P>
+            <P> U0            = 1.         </P>
+            <P> Tper          = 1./freq   </P>
+            <P> TimeStep      = Tper/NperT </P>
+            <P> NumSteps      = 10 </P>
+            <P> IO_InfoSteps  = 1000      </P>
+            <P> IO_FiltersInfoSteps   = 1000                   </P>
+            <P> IO_CFLSteps   = 1000              </P>
+            <P> omega         = 2.*PI*freq                </P>
+            <P> Kinvis        = 1./Re  </P>
+            <P> IO_CFLWriteFld = 2.0        </P>
+            <P> SVVDiffCoeff  = 0.1                 </P>
+            <P> LZ            = 1    </P>
+            <P> HomModesZ     = 4          </P>
+        </PARAMETERS>
+
+        <VARIABLES>
+            <V ID="0"> u </V>
+            <V ID="1"> v </V>
+            <V ID="2"> w </V>
+            <V ID="3"> p </V>
+        </VARIABLES>
+
+        <BOUNDARYREGIONS>
+            <B ID="0"> C[0] </B>    <!-- Wall -->
+            <B ID="1"> C[1-4] </B>  <!-- far -->
+        </BOUNDARYREGIONS>
+
+        <BOUNDARYCONDITIONS>
+            <REGION REF="0">
+                <D VAR="u" USERDEFINEDTYPE="MRFWall" VALUE=" 0" />
+                <D VAR="v" USERDEFINEDTYPE="MRFWall" VALUE="0" />
+                <D VAR="w" USERDEFINEDTYPE="MRFWall" VALUE=" 0" />
+                <N VAR="p" USERDEFINEDTYPE="MRFWall" VALUE="0" />
+            </REGION>
+            <REGION REF="1">
+                <D VAR="u" USERDEFINEDTYPE="MRFFar" VALUE="U0" />
+                <D VAR="v" USERDEFINEDTYPE="MRFFar" VALUE="0" />
+                <D VAR="w" USERDEFINEDTYPE="MRFFar" VALUE="0" />
+                <D VAR="p" VALUE="0"  />
+            </REGION>
+        </BOUNDARYCONDITIONS>
+
+        <FUNCTION NAME="InitialConditions">
+            <E VAR="u" VALUE="U0" />
+            <E VAR="v" VALUE="0" />
+            <E VAR="w" VALUE="0" />
+            <E VAR="p" VALUE="0" />
+        </FUNCTION>
+
+        <FUNCTION NAME="MRFVel">
+            <E VAR="Y" VALUE="amp*cos(omega*t+phase0)" />
+            <E VAR="v" VALUE="-omega*amp*sin(omega*t+phase0)" />
+            <E VAR="A_y" VALUE="-omega*omega*amp*cos(omega*t+phase0)" />
+            <E VAR="Theta_z" VALUE="omega*t*0.5"/>
+            <E VAR="Omega_z" VALUE="omega*0.5"/>
+            <E VAR="DOmega_z" VALUE="0"/>
+        </FUNCTION>
+    </CONDITIONS>
+
+    <FORCING>
+        <FORCE TYPE="MovingReferenceFrame">
+        </FORCE>
+    </FORCING>
+
+    <RIGIDSOLVER>
+        <FRAMEVELOCITY> MRFVel </FRAMEVELOCITY>
+    </RIGIDSOLVER>
+
+</NEKTAR>

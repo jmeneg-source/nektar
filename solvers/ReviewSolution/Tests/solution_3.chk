@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<NEKTAR>
+    <Metadata>
+        <Provenance>
+            <GitBranch>refs/heads/feature/constantSlip</GitBranch>
+            <GitSHA1>b2be0ecdf1e4b64ebcd4c107d7417b5b65b20b76</GitSHA1>
+            <Hostname>ubuntu-NUC8i7HVK</Hostname>
+            <NektarVersion>5.2.0</NektarVersion>
+            <Timestamp>31-May-2022 22:29:03</Timestamp>
+        </Provenance>
+        <ChkFileNum>3</ChkFileNum>
+        <Kinvis>1</Kinvis>
+        <SessionName0>solution.opt</SessionName0>
+        <SessionName1>solution.xml</SessionName1>
+        <Time>0.30000000000000021</Time>
+        <TimeStep>0.001</TimeStep>
+    </Metadata>
+    <ELEMENTS FIELDS="u,v,p" SHAPE="Quadrilateral" BASIS="Modified_A,Modified_A" NUMMODESPERDIR="UNIORDER:3,3" ID="0-3" COMPRESSED="B64Z-LittleEndian" BITSIZE="64">eJxjYMAHLB3qTv37//+/hcOGjbMO7p/635YRKh7vygymOcTVTF20hffhMgGm/+IBCC2RuvqVZYH4Pph+5UMQWubB4nRtWT07XPbiMh/mnnCoefs4Qxe81hLeh8teXObA9ItC3cNVctdtA9w9pIOEyB2Kv02d9v0UkeG5stWHoDleD9PK+uee2bMjkE3N4dJZG5j+PiVf6wLNQLt883kfNEv9cbqfEPCwCT4ENM/ul8i9NZe3+sDNQbeXkP6c/W9K8zUD9zmlfNsCdI+dxG4bfqC0w7LSN/IMDB/sM/m9dhzpDLaL2ljDBhLPuxfCCxL/x57y+qlJiN3GMl09F9fZ+x4n3dHV/TN7X3T4sirpnTX7YPph9l33kdNrMEjZB9MPE2cpvV2hpCpjB9MPEz8ROS9S72cjTntv74W481E9xJ7u93ETQe5s+vxyyl+X2fueZ7XtYwSad2hNsGH7jhqc9sL0w8SlZswPXwl0J0w/TPyraJu2BdA9AKT55VIA</ELEMENTS>
+</NEKTAR>

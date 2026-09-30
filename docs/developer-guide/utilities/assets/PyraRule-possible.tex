@@ -1,0 +1,68 @@
+\tdplotsetmaincoords{70}{25}
+
+\begin{tikzpicture}[line join=bevel,tdplot_main_coords,scale=2,>=latex]
+  \coordinate (A) at (-1,-1,-1);
+  \coordinate (B) at ( 1,-1,-1);
+  \coordinate (C) at ( 1, 1,-1);
+  \coordinate (D) at (-1, 1,-1);
+  \coordinate (E) at (1, 0, 1);
+
+  \coordinate (AB1) at (-0.33, -1, -1);
+  \coordinate (AB2) at (0.33, -1, -1);
+  \coordinate (AE1) at (-0.33,-0.67, -0.33);
+  \coordinate (AE2) at (0.33,-0.33, 0.33);
+  \coordinate (BE1) at (1,-0.67, -0.33);
+  \coordinate (BE2) at (1,-0.33, 0.33);
+
+  \coordinate (BC1) at (1, -0.33, -1);
+  \coordinate (BC2) at (1, 0.33, -1);
+  \coordinate (CE1) at (1, 0.67, -0.33);
+  \coordinate (CE2) at (1, 0.33, 0.33);
+  
+  \begin{scope}[blend mode=multiply]
+    \fill[green!30,fill opacity=0.3] (B) -- (C) -- (E) -- cycle;
+  \end{scope}
+  
+  \draw (A) -- (B) -- (E) -- cycle;
+  \draw (B) -- (C) -- (E) -- cycle;
+  \draw[dashed,opacity=0.5] (C) -- (D);
+  \draw[dashed,opacity=0.5] (A) -- (D) -- (E);
+
+   \draw [green!100](BC1) -- (E);
+   \draw [green!100](BC2) -- (E);
+   \draw [green!100](BE1) -- (CE1);
+   \draw [green!100](BE2) -- (CE2);
+
+  \coordinate (a) at (3.5,-1,-1);
+  \coordinate (b) at (1.5,-1,-1);
+  \coordinate (c) at (1.5,1,-1);
+  \coordinate (d) at (3.5,1,-1);
+  \coordinate (e) at (1.5,0,1);
+  
+  \coordinate (ab1) at (2.83,-1,-1);
+  \coordinate (ab2) at (2.17,-1,-1);
+  \coordinate (ae1) at (2.83,-0.67,-0.33);
+  \coordinate (ae2) at (2.17,-0.33,0.33);
+  \coordinate (be1) at (1.5,-0.67,-0.33);
+  \coordinate (be2) at (1.5,-0.33,0.33);
+  
+  \coordinate (bc1) at (1.5,-0.33,-1);
+  \coordinate (bc2) at (1.5,0.33,-1);
+  \coordinate (ce1) at (1.5,0.67,-0.33);
+  \coordinate (ce2) at (1.5,0.33,0.33);
+  
+  \begin{scope}[blend mode=multiply]
+      \fill[green!30,fill opacity=0.3] (b) -- (c) -- (e) -- cycle;
+  \end{scope}
+  
+  \draw (a) -- (b) -- (e) -- cycle;
+  \draw[dashed,opacity=0.5] (b) -- (c) -- (e);
+  \draw[dashed,opacity=0.5] (c) -- (d);
+  \draw (a) -- (d) -- (e);
+  
+  \draw [green!100](bc1) -- (e);
+  \draw [green!100](bc2) -- (e);
+  \draw [green!100](be1) -- (ce1);
+  \draw [green!100](be2) -- (ce2);
+
+\end{tikzpicture}

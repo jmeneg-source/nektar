@@ -1,0 +1,460 @@
+%\documentclass[a4paper,10pt]{article}
+
+%\usepackage[a4paper, margin=1in]{geometry} % Set 1 inch margins (adjust as needed)
+%\usepackage{tikz,tikz-3dplot}
+%\usepackage{subcaption}
+%\usepackage{hyperref}
+%\usepackage{algorithm2e}
+%\usepackage{graphicx}
+%\usepackage{listings}
+%\usetikzlibrary{trees}
+
+%% \lstdefinestyle{BashInputStyle}{
+%%   language=bash,
+%%   basicstyle=\small\ttfamily,
+%% %  numbers=left,
+%% %  numberstyle=\tiny,
+%% %  numbersep=3pt,
+%%   frame=single,
+%%   columns=fullflexible,
+%%   backgroundcolor=\color{yellow!10},
+%%   linewidth=0.95\linewidth,
+%%   xleftmargin=0.05\linewidth,
+%%   keepspaces=true,
+%%   breaklines=true,
+%%   framesep=5pt,
+%%   rulecolor=\color{black!30},
+%%   aboveskip=10pt,
+%% }
+
+%\begin{document}
+
+\section{Introduction}
+NekMesh is described in its paper \cite{NekMesh_paper} as "an
+open-source mesh generation package which is designed to enable the
+generation of valid, high-quality curvilinear meshes of complex,
+three-dimensional geometries for performing high-order simulations."
+To summarise, NekMesh is comprised of various Input, Process and
+Output modules, and the workflow is to run 1) one input module 2) $n$
+process modules 3) one output module. Before learning about the three
+module types, we need a good understanding of the theory underpinning
+the NekMesh format.
+
+\section{Theory}
+\subsection{Mesh Hierarchy}
+The most fundamental thing we need to understand is how meshes are stored. The hierarchy of components that form a mesh is given in fig. \ref{fig:NekMesh_hierarchy}\\
+
+\begin{figure}[h!]
+  \centering
+  \input{assets/NekMeshHierarchy.tex}
+  \caption{}
+  \label{fig:NekMesh_hierarchy}
+\end{figure}
+
+Meshes have a \textbf{dimensionality} of their own (eg. for a surface
+mesh \texttt{expDim = 2}, for a volume mesh \texttt{expDim = 3}), and
+exist in n-dimensional physical space (\texttt{physDim}, where
+{\texttt{physDim} $\geq$ \texttt{expDim}). \textbf{Composites} are
+  collections of elements. For elements which have the same
+  dimensionality as the physical space they are in, they are grouped
+  by their type. \textbf{Note:} boundary tri and quad elements are all
+  grouped into a singular composite. \textbf{Boundary element} are
+  elements that form the boundary of a mesh area/volume. These are one
+  dimension lower than the physical dimension (eg. in 3D space, mesh
+  volumes have boundary \textit{surfaces}).
+
+\subsection{Vertex node ordering rules}
+\label{sect:node_ordering}
+\subsubsection{Collapsed points} 
+NekMesh supports quadrilateral (quad) and triangular (tri) 2D
+elements, and tetrahedral (tet), prism, pyramid (pyra) and hexahedral
+(hex) 3D element. Elements with tri faces (all except quads and hexes)
+use a collapsed coordinate systems (fig. \ref{fig:collapsed_coords})
+\cite{textbook}, a feature which introduces constraints when
+assembling and connecting 3D elements.
+
+In the code, we indicate which node in a tri face is the collapsed point by giving it the highest node id (in \texttt{InputCGNS.cpp} and \texttt{InputStar.cpp} the node ordering is done in the function \texttt{ResetNodes}). Note that the relative ordering between nodes in \textit{different faces} (even if in the same element) has no affect.
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{assets/QuadCoords.tex}
+        \caption{Coordinate system for the reference quadrilateral.}
+        \label{fig:quad_coords}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{assets/CollapsedCoords.tex}
+        \caption{Collapsed coordinate system for the reference triangle. Node 2 is considered the 'collapsed point'.}
+        \label{fig:collapsed_coords}
+    \end{subfigure}
+    \caption{Coordinate systems for 2D elements/faces.}
+    \label{fig:coords}
+\end{figure}
+
+\subsubsection{Tri interface rule}
+This rule simply states that when tri faces on two elements meet, the collapsed point must be the same for each tri (fig. \ref{fig:tri_interface_rule}).
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{assets/PrismRule-ok_join.tex}
+        \caption{Valid element: neighbouring tri faces are alligned}
+        \label{fig:prism_rule_ok_join}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{assets/PrismRule-bad_join.tex}
+        \caption{Invalid element: neighbouring tri faces are misalligned}
+        \label{fig:prism_rule_bad_join}
+    \end{subfigure}
+    \caption{Tri interface rule}
+    \label{fig:tri_interface_rule}
+\end{figure}
+
+\subsubsection{Prism rule}
+For prism elements, the collapsed point on both the tri faces must correspond (ie. there must be an edge joining them) (fig. \ref{fig:prism_rule}). Combining this with rule 1., we see that in a prism line (line of prisms joined by their tri faces), they all must be oriented in the same way.
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{assets/PrismRule-ok.tex}
+        \caption{Valid element: two tri faces are alligned}
+        \label{fig:prism_rule_ok}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{assets/PrismRule-bad.tex}
+        \caption{Invalid element: two tri faces are misalligned}
+        \label{fig:prism_rule_bad}
+    \end{subfigure}
+    \caption{Prism rule}
+    \label{fig:prism_rule}
+\end{figure}
+
+
+\subsubsection{Pyramid rule}
+In a pyramid element, the collapsed point on all four tri faces must be at the apex of the pyramid (fig. \ref{fig:pyra_rule}).
+
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{assets/PyraRule-ok.tex}
+        \caption{Valid element: collapsed points at the apex for all tri faces}
+        \label{fig:pyra_rule_ok}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{assets/PyraRule-bad.tex}
+        \caption{Invalid element: collapsed points not at the apex for all tri faces}
+        \label{fig:pyra_rule_bad}
+    \end{subfigure}
+    \caption{Pyramid rule}
+    \label{fig:pyra_rule}
+\end{figure}
+
+\subsubsection{Tet and Hex elements}
+Tet and hex elements \ref{fig:hex_and_tet} are more flexible in their orientation due to their symmetry (and lack of tri faces in the case of hexes), so don't introduce any additional rules.
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{assets/Tet-ok.tex}
+        \caption{}
+        \label{fig:tet_ok}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{assets/Hex-ok.tex}
+        \caption{}
+        \label{fig:hex_ok}
+    \end{subfigure}
+    \caption{Hex and tet elements...}
+    \label{fig:hex_and_tet}
+\end{figure}
+
+\subsubsection{Impossible meshes}
+When we combine the three rules simultaniously, there are a few mesh cases which are impossible to mesh \ref{fig:pyra_impossible}, but it is considered the responsibility of the mesh generator to avoid these. Therefore NekMesh deals with meshes that \textit{are} possible \textit{and} are likely to be produced my a CFD mesh generator.\\
+
+\begin{figure}[h!]
+  \centering
+  \input{assets/PyraRule-impossible.tex}
+  \caption{}
+  \label{fig:pyra_impossible}
+\end{figure}
+
+Since pyramid elements are the cause of these impossible meshes, one method used to rectify problematic pyramids is to use \textit{pyramid shielding} (fig. \ref{fig:pyramid_shielding}). The idea is to replace any problematic pyramid with a smaller pyramid, plus four tets \textit{shielding} the triangular pyramid faces from any neighbouring pyramid or prism elements. This decouples the pyramid's apex from neighbouring elements, due to the aforementioned flexibility of tets.
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{assets/PyraShielding-before.tex}
+        \caption{Before}
+        \label{fig:pyramid_shielding-before}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \raisebox{-5mm}{ % Adjust this value to move the second subfigure down
+            \input{assets/PyraShielding-after.tex}
+        }
+        \caption{After}
+        \label{fig:pyramid_shielding-after}
+    \end{subfigure}
+    \caption{Before and after of the process of pyramid shielding. The pyra no longer restricts the orientation of neighbouring elements, so the impossible cases are avoided.}
+    \label{fig:pyramid_shielding}
+\end{figure}
+
+\subsubsection{Implementation}
+Assuming we are given a valid mesh, we now need an algorithm (see alg. \ref{alg:ResetNodes}) to order the nodes to define the orientation of the elements in accordance with the three rules. In \texttt{InputCGNS.cpp} and \texttt{InputStar.cpp}, this is implemented as the function \texttt{ResetNodes}.\\
+
+\SetKwComment{Comment}{/* }{}
+\begin{algorithm}[hbt!]
+\caption{Setting ordering of node IDs in mesh}
+\label{alg:ResetNodes}
+    \input{assets/ResetNodes.tex}
+\end{algorithm}
+
+Let's work through a simple example implementation. Say we are given the test mesh in fig \ref{fig:ResetNodes_example}; it contains 6 elements (2 pyras and 4 prisms) and 14 nodes. We must assign each of the nodes a unique ID (0-13), compatible with the three rules.
+
+\begin{enumerate}
+  \item{Label the apex of the first pyra (0) with the highest available ID (13).}
+  \item{Pyra 0 shares a tri face with prism 2, so we must ID the corresponding node (12) on the opposite face of prism 2.}
+  \item{We move to the next pyra (1) and assert that of all the ID'd nodes, the apex has the highest ID (true, since only the apex has been ID'd).}
+  \item{With the pyramids correctly oriented, we move to the \textit{untouched} prisms (3, 4, 5), which all form a prism line. We arbitrarily assign the line of nodes labelled 11-8-5-2 as \textit{the} line of collapsed points and ensure that the points along this line have the highest ID on their respective tri faces.}
+  \item{We have now labelled all the nodes, but if any were yet unlabelled, we would give them the remaining IDs (from low to high).}
+\end{enumerate}
+
+\begin{figure}[h!]
+  \centering
+  \input{assets/ResetNodesExample-after.tex}
+  \caption{Node ordering determined by \texttt{ResetNodes} algorithm. Element IDs (already given): blue, node IDs: red.}
+  \label{fig:ResetNodes_example}
+\end{figure}
+
+\subsection{Higher-order node ordering rules}
+\label{sect:HO_node_ordering}
+As well as the order of the global node IDs, we also need to take care
+with the ordering of higher order nodes when creating elements, since
+the NekMesh convention is different from other formats (namely .gmsh
+and .cgns). Shown in figure \ref{fig:ho_2D_elements}, we can see that
+the method for ordering quad and tri nodes is the same: primary nodes
+(in black) are always included (clockwise), followed by mid-edge nodes
+(in red) for \textit{all} higher order elements (also
+clockwise). Mid-face nodes (in blue) are optional, but if included
+they are next (ordered row-by-row).
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{assets/HOquad-arrow.tex}
+        \caption{Orientation of quad face is indicated by the arrow (0 $\rightarrow$ 1 $\rightarrow$ 2 $\rightarrow$ 3). This is same representation will be used for 3D elements.}
+        \label{fig:ho_quad-arrow}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{assets/HOquad-numbered.tex}
+        \caption{Node ordering given for a 4th order quad element with mid-edge and mid-face nodes.}
+        \label{fig:ho_quad-numbered}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{assets/HOtri-arrow.tex}
+        \caption{Orientation of tri face is indicated by the arrow (0 $\rightarrow$ 1 $\rightarrow$ 2 $\rightarrow$ 3).}
+        \label{fig:ho_tri-arrow}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{assets/HOtri-numbered.tex}
+        \caption{Node ordering given for a 4th order tri element with mid-edge and mid-face nodes.}
+        \label{fig:ho_tri-numbered}
+    \end{subfigure}
+    \caption{Node ordering rules for higher order quad and tri elements}
+    \label{fig:ho_2D_elements}
+\end{figure}
+
+Using the edge and face definitions in fig \ref{fig:ho_3D_elements},
+we can derive the node ordering for higher order 3D elements too. As
+in the 2D case, it is a concatenation of the vertices, then all the
+mid-edge nodes, then all the mid-face nodes (if included) then all the
+mid-volume nodes (if included).
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{assets/HOtet.tex}
+        \caption{High-order tet}
+        \label{fig:ho_tet}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{assets/HOprism.tex}
+        \caption{High-order prism}
+        \label{fig:ho_prism}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+       \resizebox{1.25\textwidth}{!}{\input{assets/HOpyra.tex}}
+        \caption{High-order pyra}
+        \label{fig:ho_pyra}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \resizebox{1.1\textwidth}{!}{\input{assets/HOhex.tex}}
+        \caption{High-order hex}
+        \label{fig:ho_hex}
+    \end{subfigure}
+    \caption{Node ordering rules for higher order 3D elements elements}
+    \label{fig:ho_3D_elements}
+\end{figure}
+
+Mid-volume nodes are ordered in a similar fashion to mid-face
+nodes. They are given slice-by-slice, parallel to and moving away from
+face 0, and with the orientation dictated by face 0. This is most
+easily seen in the example given in fig. \ref{fig:vol_nodes}. For pyra
+and prisms, the slices are still quads, but with the size of/number of
+nodes in each slice decreasing away from face 0. For tets, the slices
+are triangular and with decreasing size.
+
+\begin{figure}[h!]
+  \centering
+  \input{assets/VolumeNodes.tex}
+  \caption{Volume node ordering for a 4th order hex element}
+  \label{fig:vol_nodes}
+\end{figure}
+
+\section{Input Modules}
+As well as being able to generate meshes in NekMesh, we seek to make
+NekMesh compatible with multiple commonly-used file formats, enabling
+users to create meshes in their chosen mesh generation software,
+before either elevating their order in NekMesh or using it as is. Some
+file formats provide an API for reading from (and writing to) them;
+this includes .ccm with CCMIO and .cgns with CGNS Mid-Level
+Library. Other formats such as .gmsh do not, so we must manually read
+the file with \texttt{stringstream}. Once the required information
+(such as node coordinates, elements nodes, boundary conditions etc.)
+has been read from the file, however, the process is the same:
+
+\begin{enumerate}
+\item For each node we must first create a node shared pointer
+  (\texttt{NodeSharedPtr}) append it to \texttt{m\_node} and insert it
+  into \texttt{vertexSet} eg.\\
+\begin{lstlisting}[style=BashInputStyle]
+NodeSharedPtr newNode = std::make_shared<Node>(id, x, y, z);
+m_mesh->m_node.push_back(newNode);
+m_mesh->m_vertexSet.insert(newNode);
+\end{lstlisting}
+ 
+...\textbf{ensuring} that the node IDs all comply with the Prism and
+Pyramid rules (section \ref{sect:node_ordering}).
+
+\item We must then append an ElementSharedPtr for each element
+  (internal \textit{and} boundary), eg.
+\begin{lstlisting}[style=BashInputStyle]
+ElementSharedPtr E = GetElementFactory().CreateInstance(elType, conf,
+nodeList, tags); m_mesh->m_element[E->GetDim()].push_back(E);
+\end{lstlisting}
+
+\item Once the elements and nodes have been correctly created, the
+  following functions are called sequentially to process this
+  information into the NekMesh format.
+\begin{lstlisting}[style=BashInputStyle]
+ProcessEdges();
+ProcessFaces(); 
+ProcessElements(); 
+ProcessComposites(); 
+\end{lstlisting}
+\end{enumerate}
+
+\subsection{StarCCM+ .ccm input (InputStar.cpp)}
+
+\subsection{Gmsh .msh input (InputGmsh.cpp)}
+
+\subsection{CGNS .cgns input (InputCGNS.cpp)}
+Information about the CGNS Standard Interface Data Structure (SIDS)
+can be found at
+\url{https://cgns.github.io/CGNS_docs_current/sids}. This converter
+makes use of the CGNS Mid-Level Library and information about that can
+be found at \url{https://cgns.github.io/CGNS_docs_current/midlevel}.We
+will summarise the key points about the CGNS standard.\\
+
+Every file will contain at least one zone, which contains information
+about coordinates and the mesh. Each zone contains at least one base,
+which contain information about the information about the
+dimensionality of the domain (fig. \ref{fig:cgn-db-hierarchy}).
+
+\begin{figure}[h]
+ \centering
+  \includegraphics[width=0.6\textwidth]{img/CGNS_database_hierarchy.png}
+  \caption{CGNS database hierarchy. Image from cgns.github.io}
+  \label{fig:cgns-db-hierarchy}
+\end{figure}
+
+Elements are stored in sections where they are grouped by element type
+in the case of SEPARATED CGNS files or all the elements are grouped
+together in the case of a MIXED CGNS file. Depending on the file
+format, the \texttt{InputCGNS.cpp} either uses ExtractMixedElemInfo()
+or ExtractSeparatedElemInfo(). In both case, an array
+\texttt{ElementConnectivity} is read in, containing the node IDs for
+each element (in the MIXED format the element type must also be
+specified for each element). Each function takes the
+\texttt{ElementConnectivity} array and generates a vector
+\texttt{elemInfo} which contains the type and node list for each
+element.\\
+
+The function ReadFaces converts from \texttt{elemInfo} into a face
+representation, where each element is defined by its face
+(\texttt{ElementFaces}), each face is defined by its nodes
+(\texttt{FaceNodes}), and the boundary element faces of the mesh are
+stored in \texttt{BndElementFaces}. These three variables are required
+for the next function \texttt{ResetNodes} and allows us to re-use a
+large section of code from the \texttt{InputStar} converter. \\
+
+The final step that must be mentioned is the fact that CGNS and
+NekMesh use different conventions for the order in which to list
+higher order nodes. In the functions \texttt{GenElement2D} and
+\texttt{GenElement3D}, we must use mappings generated by
+\texttt{CGNSReordering} to map between the diffent
+conventions. Although these could be produced algorithmically (and one
+would want to if CGNS supported orders higher than 4th), for the
+moment they have been hard-coded in by manually comparing the node
+orderings in the CGNS SIDS \cite{SIDS_node_ordering} and NekMesh
+\ref{sect:HO_node_ordering}.
+
+%\subsection{CCM/CGNS shared base class (InputStarCGNS.cpp)}
+%\texttt{ResetNodes} is the function responsible with renumbering the
+%node IDs in accordance with the rules in section \ref{}. It requires
+%the variables \texttt{ElementFaces} and \texttt{FaceNodes}, which are
+%created differently in the two input modules, since .ccm and .cgns
+%store elements differently.\\ \texttt{CreateElements} creates the 3D
+%and then 2D elements
+
+\section{Process Modules}
+\section{Output Modules}
+
+
+\begin{thebibliography}{References}
+ \bibitem{NekMesh_paper} NekMesh: An open-source high-order mesh generation framework
+ \bibitem{textbook} George Karniadakis, Spencer Sherwin, \textit{Spectral/hp Element Methods for Computational Fluid Dynamics}
+ \bibitem{SIDS_node_ordering}\url{ https://cgns.github.io/CGNS_docs_current/sids/conv.html\#unstructgrid}
+\end{thebibliography}
+
+%\end{document}

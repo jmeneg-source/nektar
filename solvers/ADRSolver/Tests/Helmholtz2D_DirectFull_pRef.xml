@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<NEKTAR>
+
+    <GEOMETRY DIM="2" SPACE="3">
+        <VERTEX COMPRESSED="B64Z-LittleEndian" BITSIZE="64">eJxjYMAHPuxnxCFT5gEiH+xnQhPfIgERd2GF0Mw49MHMZ8FhL4zFikP+++L/QHB/Pxte8xkY2HG4HwY48Nr/YT8ndnl7mDwXmgzUXXB5bjT5ZY8h8rfEIO7kwWE+zB+8eM1nYODD6z4GBn787rcXQJOB2guXF0STz2SGyMP8IYTDfJg7hbHKI/whgkMeZo4odnFY/NiL4ZCH+UMcTaYCmi5Nof6QwO4uuPkAO1ltZQAA</VERTEX>
+        <EDGE COMPRESSED="B64Z-LittleEndian" BITSIZE="64">eJx1kscSgkAUBDEiBsAAigGM+P9/6IU+2FVvL1O9MLPztjZJ/tco0HGgk0BZU+ksUPLmAadi8hbqyX9Z4FvqXPwrMXOslYd/I8afi/EXQV6p/vi2ymftBmUueuzF5By0T79KTK9afel3FNPvJKZfIybvrHP5flEOfa/aZ86bmPto1ZP5OzG++6DcB/M/xMz/FDP/S0zeW+fh+4h5n716kvdVH97/D8M4Br8A</EDGE>
+        <ELEMENT>
+            <Q COMPRESSED="B64Z-LittleEndian" BITSIZE="64">eJxd0UcSwjAQRFGTsw0mJ5Ph/jdk8//Crc2rskat0bgo2quDXezF9z4OcIijODfGSdSZY+4UZ3HefO+b4wJLrKLetYz6VfRhfzWu45zvKWN/g9vI2eEeD3hE53CK/XPkOo869i94RefV4C3q7MO53fGBT3yhc7JP73njB53HN3Kssw//yw+dpzn28QeSnAU9</Q>
+        </ELEMENT>
+        <COMPOSITE>
+            <C ID="13"> E[32,39,4,10] </C>
+            <C ID="14"> E[11,3,17,12] </C>
+            <C ID="15"> E[15,21,26,25] </C>
+            <C ID="16"> E[22,30,38,35] </C>
+            <C ID="17"> Q[0-15] </C>
+        </COMPOSITE>
+        <DOMAIN>
+            <D ID="0"> C[17] </D>
+        </DOMAIN>
+    </GEOMETRY>
+
+    <EXPANSIONS>
+        <E COMPOSITE="C[17]"
+            NUMMODES="5"
+            TYPE="MODIFIED"
+            FIELDS="u"
+            REFIDS="0,1,2" />
+    </EXPANSIONS>
+
+    <REFINEMENTS>
+        <R REF="0"
+            TYPE="SPHERE"
+            RADIUS="0.1"
+            COORDINATE1="0.0,0.5,0.5"
+            NUMMODES="7" />
+
+        <R REF="1"
+            TYPE="SPHERE"
+            RADIUS="0.1"
+            COORDINATE1="0.0,-0.5,0.5"
+            NUMMODES="9" />
+
+        <R REF="2"
+            TYPE="SPHERE"
+            RADIUS="0.1"
+            COORDINATE1="0.0,-0.5,-0.5"
+            NUMMODES="11" />
+    </REFINEMENTS>
+
+    <CONDITIONS>
+
+        <PARAMETERS>
+            <P> wavefreq       = PI               </P>
+            <P> Lambda         = 1.0              </P>
+        </PARAMETERS>
+
+        <SOLVERINFO>
+            <I PROPERTY="EQTYPE"                VALUE="Helmholtz"  />
+            <I PROPERTY="Projection"            VALUE="Continuous" />
+            <I PROPERTY="DiffusionAdvancement"  VALUE="Implicit"   />
+            <I PROPERTY="GlobalSysSoln"         VALUE="DirectFull" />
+            <!--
+                <I PROPERTY="GlobalSysSoln"         VALUE="DirectStaticCond"          />
+            -->
+        </SOLVERINFO>
+
+        <VARIABLES>
+            <V ID="0"> u </V>
+        </VARIABLES>
+
+        <BOUNDARYREGIONS>
+            <B ID="0"> C[13] </B>
+            <B ID="1"> C[14] </B>
+            <B ID="2"> C[15] </B>
+            <B ID="3"> C[16] </B>
+        </BOUNDARYREGIONS>
+
+        <BOUNDARYCONDITIONS>
+            <REGION REF="0">
+                <N VAR="u" VALUE="-wavefreq * sin(wavefreq*z) * cos(wavefreq*y)" />
+            </REGION>
+
+            <REGION REF="1">
+                <N VAR="u" VALUE="-wavefreq * cos(wavefreq*z) * sin(wavefreq*y)" />
+            </REGION>
+
+            <REGION REF="2">
+                <N VAR="u" VALUE="wavefreq * sin(wavefreq*z) * cos(wavefreq*y)" />
+            </REGION>
+
+            <REGION REF="3">
+                <N VAR="u" VALUE="wavefreq * cos(wavefreq*z) * sin(wavefreq*y)" />
+            </REGION>
+        </BOUNDARYCONDITIONS>
+
+        <FUNCTION NAME="ExactSolution">
+            <E VAR="u"
+                VALUE="sin(wavefreq*y)*sin(wavefreq*z)" />
+        </FUNCTION>
+
+        <FUNCTION NAME="Forcing">
+            <E VAR="u" VALUE="- (2 * wavefreq * wavefreq + Lambda)  * sin(wavefreq*y)*sin(wavefreq*z)" />
+        </FUNCTION>
+
+    </CONDITIONS>
+</NEKTAR>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<NEKTAR xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://www.nektar.info/schema/nektar.xsd">
+
+    <CONDITIONS>
+        <SOLVERINFO>
+            <I PROPERTY="NonlinearSolver" VALUE="NewtonBacktrack" />
+            <I PROPERTY="LinSysIterSolver"   VALUE="GMRES"/>
+        </SOLVERINFO>
+        <PARAMETERS>
+            <P> NonlinIterTolRelativeL2 = 1e-15 </P>
+            <P> LinSysMaxStorage = 2 </P>
+            <P> NekNonlinSysMaxIterations = 50 </P>
+
+            <P> NewtonScaleInit        = 1.0e-1 </P>
+            <P> NewtonScaleMax         = 5.0e-1 </P>
+            <P> NewtonScaleMin         = 1.0e-3 </P>
+            <P> NewtonScaleGrowFactor  = 2.0    </P>
+            <P> BacktrackFactor        = 0.5    </P>
+            <P> MaxBacktrackSteps      = 4      </P>
+            <P> AcceptReductionEta     = 1.0e-4 </P>
+        </PARAMETERS>
+        <VARIABLES>
+            <V ID="0"> u </V>
+        </VARIABLES>
+
+    </CONDITIONS>
+</NEKTAR>

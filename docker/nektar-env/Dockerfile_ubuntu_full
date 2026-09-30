@@ -1,0 +1,16 @@
+FROM %%REGISTRY%%:env-%%OS_DISTRO%%-%%OS_VERSION%%-default
+ARG PIP_FLAGS
+
+LABEL maintainer="Nektar++ Development Team <nektar-users@imperial.ac.uk>"
+
+USER root
+COPY docker/nektar-env/${UBUNTU_VERSION}_full_packages.txt packages.txt
+
+RUN export DEBIAN_FRONTEND=noninteractive && \
+	apt-get update && \
+	apt-get install -y $(cat packages.txt) \
+	&& rm -rf /var/lib/apt/lists/*
+
+RUN pip install $PIP_FLAGS myokit
+
+USER nektar:nektar

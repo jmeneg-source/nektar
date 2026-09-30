@@ -1,0 +1,53 @@
+\tdplotsetmaincoords{70}{50}
+
+\begin{tikzpicture}[line join=bevel,tdplot_main_coords,scale=2,>=latex]
+  \coordinate (A) at (-1,-1,-1);
+  \coordinate (AB1) at (-0.33,-1,-1);
+  \coordinate (AB2) at (0.33,-1,-1);
+  \coordinate (AE1) at (-1,-1,-0.33);
+  \coordinate (AE2) at (-1,-1,0.33);
+  \coordinate (B) at ( 1,-1,-1);
+  \coordinate (BC1) at ( 1,-0.33,-1);
+  \coordinate (BC2) at ( 1,0.33,-1);
+  \coordinate (BF1) at (1,-1,-0.33);
+  \coordinate (BF2) at (1,-1,0.33);
+  \coordinate (C) at ( 1, 1,-1);
+  \coordinate (CG1) at (1,1,-0.33);
+  \coordinate (CG2) at (1,1,0.33);
+  \coordinate (D) at (-1, 1,-1);
+  \coordinate (E) at (-1,-1, 1);
+  \coordinate (EF1) at (-0.33,-1,1);
+  \coordinate (EF2) at (0.33,-1,1);
+  \coordinate (EH1) at (-1,-0.33, 1);
+  \coordinate (EH2) at (-1,0.33, 1);
+  \coordinate (F) at ( 1,-1, 1);
+  \coordinate (FG1) at ( 1,-0.33,1);
+  \coordinate (FG2) at ( 1,0.33,1);
+  \coordinate (G) at ( 1, 1, 1);
+  \coordinate (GH1) at ( 0.33, 1, 1);
+  \coordinate (GH2) at (-0.33, 1, 1);
+  \coordinate (H) at (-1, 1, 1);
+  
+  \begin{scope}[blend mode=multiply]
+    \fill[green!30,fill opacity=0.3] (A) -- (B) -- (F) -- (E) -- cycle;
+    \fill[green!30,fill opacity=0.3] (B) -- (C) -- (G) -- (F) -- cycle;
+    \fill[green!30,fill opacity=0.3] (E) -- (F) -- (G) -- (H) -- cycle;
+  \end{scope}
+
+   \draw [green!100](AB1) -- (EF1) -- (GH2);
+   \draw [green!100](AB2) -- (EF2) -- (GH1);
+   \draw [green!100](BC1) -- (FG1) -- (EH1);
+   \draw [green!100](BC2) -- (FG2) -- (EH2);
+   \draw [green!100](AE1) -- (BF1) -- (CG1);
+   \draw [green!100](AE2) -- (BF2) -- (CG2);
+  
+  \draw (A) -- (B) -- (C);
+  \draw (A) -- (E);
+  \draw (B) -- (F);
+  \draw (C) -- (G);
+  \draw (E) -- (F) -- (G) -- (H) -- cycle;
+
+  \draw[dashed,opacity=0.5] (D) -- (H);
+  \draw[dashed,opacity=0.5] (C) -- (D) -- (A);
+
+\end{tikzpicture}

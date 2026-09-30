@@ -1,0 +1,113 @@
+<!-- NACA-NLF-SectionD Normal-to-Leading-Edge direction - 2D compressible -->
+<?xml version="1.0" encoding="utf-8"?>
+
+<NEKTAR>
+    <EXPANSIONS>
+        <E COMPOSITE="C[100,101]" NUMMODES="4" FIELDS="rho,rhou,rhov,E" TYPE="MODIFIED" />
+    </EXPANSIONS>
+
+    <CONDITIONS>
+        <SOLVERINFO>
+            <I PROPERTY="EQType"                VALUE="NavierStokesImplicitCFE"/>
+            <I PROPERTY="Projection"            VALUE="DisContinuous"       />
+            <I PROPERTY="AdvectionType"         VALUE="WeakDG"              />
+            <I PROPERTY="DiffusionType"         VALUE="InteriorPenalty"     />
+            <I PROPERTY="AdvectionAdvancement"  VALUE="Implicit"            />
+            <I PROPERTY="DiffusionAdvancement"  VALUE="Implicit"            />
+            <I PROPERTY="UpwindType"            VALUE="Roe"                 />
+            <I PROPERTY="ProblemType"           VALUE="General"             />
+            <I PROPERTY="ViscosityType"         VALUE="Constant"            />
+        </SOLVERINFO>
+        <TIMEINTEGRATIONSCHEME>
+            <METHOD> DIRK </METHOD>
+            <ORDER> 2 </ORDER>
+        </TIMEINTEGRATIONSCHEME>
+        <PARAMETERS>
+            <!--Computational parameters-->
+            <P> TimeStep            = 1e-6 			</P>
+            <P> NumSteps            = 1e5       			</P> <!-- 100000 -->
+            <P> IO_CheckSteps       = 5e4          			</P>
+            <P> IO_InfoSteps        = 10            			</P>
+            <P> IO_CFLSteps         = 10            			</P>
+            <!-- Fluid properties -->
+            <P> Gamma               = 1.4          			</P>
+            <P> Pr                  = 0.72         			</P>
+            <P> Mach                = 0.8        			</P>
+            <P> Re                  = 1.0e6      			</P>
+            <P> GasConstant         = 1/(Gamma*Mach*Mach)		</P>
+            <P> mu		    = 1.0/Re    			</P><!--1 for NS-->
+            <!-- Boundary condition parameters-->
+            <P> rhoInf              = 1            			</P>
+            <P> TInf                = 1            			</P>
+            <P> pInf   		    = rhoInf*GasConstant*TInf	</P>
+            <P> Twall               = 1            			</P>
+
+            <P> Lref                = 1            			</P>
+            <P> Uref		    = 1	       			</P>
+            <P> uInf                = 1.0          </P>
+            <P> vInf                = 0.0          </P>
+            <!--wInf=Uref*sin(37.3*PI/180)-->
+
+            <!--LST parameters-->
+            <P> INEUTRL = 0       </P>
+            <P> NGLOBAL = 101     </P>
+            <P> NLOCAL  = 221     </P>
+            <P> ITOLRAY = 5       </P>
+            <P> BETALIN = 0.0     </P>
+            <P> FREQLIN = 20000.0 </P>
+            <P> RGAS    = 287.0   </P>
+            <P> GAMMA   = Gamma   </P>
+            <P> PRANDTL = Pr      </P>
+        </PARAMETERS>
+
+        <VARIABLES>
+            <V ID="0"> rho  </V>
+            <V ID="1"> rhou </V>
+            <V ID="2"> rhov </V>
+            <V ID="3"> E    </V>
+        </VARIABLES>
+
+        <BOUNDARYREGIONS>
+            <B ID="0"> C[2] </B>  	<!-- wall -->
+            <B ID="1"> C[1] </B>  	<!-- inflow -->
+            <B ID="2"> C[3] </B>  	<!-- outflow -->
+            <B ID="3"> C[4] </B>  	<!-- freestream -->
+        </BOUNDARYREGIONS>
+
+        <BOUNDARYCONDITIONS>
+            <REGION REF="0">   <!-- wall -->
+                <D VAR="rho"  USERDEFINEDTYPE="WallViscous" VALUE="0" />
+                <D VAR="rhou" USERDEFINEDTYPE="WallViscous" VALUE="0" />
+                <D VAR="rhov" USERDEFINEDTYPE="WallViscous" VALUE="0" />
+                <D VAR="E"    USERDEFINEDTYPE="WallViscous" VALUE="0" />
+            </REGION>
+            <REGION REF="1">   <!-- inflow -->
+                <D VAR="rho"  VALUE="1.0" />
+                <D VAR="rhou" VALUE="(-6.786e16*y^6 + 2.985e14*y^5 -2.197e11*y^4 -5.139e8*y^3 + 2.852e5*y^2 + 1136*y)*(y<0.002) + 1.0*(y>=0.002)" />
+                <D VAR="rhov" VALUE="0.0" />
+                <D VAR="E"    VALUE="pInf/(Gamma-1)+0.5*rhoInf*(((-6.786e16*y^6 + 2.985e14*y^5 -2.197e11*y^4 -5.139e8*y^3 + 2.852e5*y^2 + 1136*y)*(y<0.002) + 1.0*(y>=0.002))*((-6.786e16*y^6 + 2.985e14*y^5 -2.197e11*y^4 -5.139e8*y^3 + 2.852e5*y^2 + 1136*y)*(y<0.002) + 1.0*(y>=0.002)))" />
+            </REGION>
+            <REGION REF="2">  <!-- outflow -->
+                <D VAR="rho"  USERDEFINEDTYPE="PressureOutflow" VALUE="0" />
+                <D VAR="rhou" USERDEFINEDTYPE="PressureOutflow" VALUE="0" />
+                <D VAR="rhov" USERDEFINEDTYPE="PressureOutflow" VALUE="0" />
+                <D VAR="E"    USERDEFINEDTYPE="PressureOutflow" VALUE="pInf" />
+            </REGION>
+            <REGION REF="3">  <!-- freestream -->
+                <D VAR="rho"  USERDEFINEDTYPE="PressureOutflow" VALUE="0" />
+                <D VAR="rhou" USERDEFINEDTYPE="PressureOutflow" VALUE="0" />
+                <D VAR="rhov" USERDEFINEDTYPE="PressureOutflow" VALUE="0" />
+                <D VAR="E"    USERDEFINEDTYPE="PressureOutflow" VALUE="pInf" />
+            </REGION>
+        </BOUNDARYCONDITIONS>
+
+        <FUNCTION NAME="InitialConditions">
+            <!--<F VAR="rho,rhou,rhov,E" FILE="P3_t015.fld" />-->
+            <E VAR="rho"  VALUE="rhoInf" />
+            <E VAR="rhou" VALUE="rhoInf*uInf" />
+            <E VAR="rhov" VALUE="rhoInf*vInf" />
+            <E VAR="E"    VALUE="pInf/(Gamma-1) + 0.5*rhoInf*(uInf*uInf + vInf*vInf)" />
+        </FUNCTION>
+
+    </CONDITIONS>
+</NEKTAR>

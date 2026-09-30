@@ -1,0 +1,351 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+// File: CoalescedGeomData.cpp
+//
+// For more information, please see: http://www.nektar.info
+//
+// The MIT License
+//
+// Copyright (c) 2006 Division of Applied Mathematics, Brown University (USA),
+// Department of Aeronautics, Imperial College London (UK), and Scientific
+// Computing and Imaging Institute, University of Utah (USA).
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the "Software"),
+// to deal in the Software without restriction, including without limitation
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+//
+// Description: Coalesced geometry data definition
+//
+///////////////////////////////////////////////////////////////////////////////
+
+#include <Collections/CoalescedGeomData.h>
+#include <LocalRegions/Expansion.h>
+#include <SpatialDomains/GeomFactors.h>
+
+using namespace std;
+
+namespace Nektar::Collections
+{
+
+const Array<OneD, const NekDouble> &CoalescedGeomData::GetJac(
+    vector<LocalRegions::ExpansionSharedPtr> &pCollExp)
+{
+
+    if (m_oneDGeomData.count(eJac) == 0)
+    {
+        LibUtilities::PointsKeyVector ptsKeys = pCollExp[0]->GetPointsKeys();
+        int nElmts                            = pCollExp.size();
+        int npts                              = pCollExp[0]->GetTotPoints();
+
+        if (IsDeformed(pCollExp))
+        {
+            Array<OneD, NekDouble> newjac(npts * nElmts);
+
+            // copy Jacobians into a continuous list and set new chatched value
+            int cnt = 0;
+            for (int i = 0; i < nElmts; ++i)
+            {
+                const Array<OneD, const NekDouble> jac =
+                    pCollExp[i]->GetGeomFactors()->GetJac();
+
+                Vmath::Vcopy(npts, &jac[0], 1, &newjac[cnt], 1);
+
+                cnt += npts;
+            }
+
+            m_oneDGeomData[eJac] = newjac;
+        }
+        else
+        {
+            Array<OneD, NekDouble> newjac(nElmts);
+            // copy Jacobians into a continuous list
+            for (int i = 0; i < nElmts; ++i)
+            {
+                const Array<OneD, const NekDouble> jac =
+                    pCollExp[i]->GetGeomFactors()->GetJac();
+
+                newjac[i] = jac[0];
+            }
+            m_oneDGeomData[eJac] = newjac;
+        }
+    }
+
+    return m_oneDGeomData[eJac];
+}
+
+const std::shared_ptr<VecVec_t> CoalescedGeomData::GetJacInterLeave(
+    vector<LocalRegions::ExpansionSharedPtr> &pCollExp, int nElmt)
+{
+
+    if (m_oneDGeomDataInterLeave.count(eJac) == 0)
+    {
+        const Array<OneD, const NekDouble> jac = GetJac(pCollExp);
+        int jacsize                            = jac.size();
+        int npts                               = pCollExp[0]->GetTotPoints();
+
+        ASSERTL1(nElmt % vec_t::width == 0,
+                 "Number of elements not divisible by vector "
+                 "width, padding not yet implemented.");
+        int nBlocks = nElmt / vec_t::width;
+
+        VecVec_t newjac;
+
+        LibUtilities::PointsKeyVector ptsKeys = pCollExp[0]->GetPointsKeys();
+
+        if (IsDeformed(pCollExp))
+        {
+            newjac.resize(nBlocks * npts);
+
+            alignas(vec_t::alignment) NekDouble tmp[vec_t::width];
+
+            for (size_t block = 0; block < nBlocks; ++block)
+            {
+                size_t nblock_width = block * npts * vec_t::width;
+                for (size_t q = 0; q < npts; q++)
+                {
+                    for (int j = 0; j < vec_t::width; ++j)
+                    {
+                        if (nblock_width + npts * j + q < jacsize)
+                        {
+                            tmp[j] = jac[nblock_width + npts * j + q];
+                        }
+                        else
+                        {
+                            tmp[j] = 0.0;
+                        }
+                    }
+
+                    // Order is [block][quadpt]
+                    newjac[block * npts + q].load(&tmp[0]);
+                }
+            }
+        }
+        else
+        {
+            newjac.resize(nBlocks);
+
+            alignas(vec_t::alignment) NekDouble tmp[vec_t::width];
+            for (size_t i = 0; i < nBlocks; ++i)
+            {
+                for (int j = 0; j < vec_t::width; ++j)
+                {
+                    if (vec_t::width * i + j < jacsize)
+                    {
+                        tmp[j] = jac[vec_t::width * i + j];
+                    }
+                    else
+                    {
+                        tmp[j] = 0.0;
+                    }
+                }
+
+                newjac[i].load(&tmp[0]);
+            }
+        }
+
+        m_oneDGeomDataInterLeave[eJac] =
+            MemoryManager<VecVec_t>::AllocateSharedPtr(newjac);
+    }
+
+    return m_oneDGeomDataInterLeave[eJac];
+}
+
+const Array<OneD, const NekDouble> &CoalescedGeomData::GetJacWithStdWeights(
+    vector<LocalRegions::ExpansionSharedPtr> &pCollExp)
+{
+    if (m_oneDGeomData.count(eJacWithStdWeights) == 0)
+    {
+        LibUtilities::PointsKeyVector ptsKeys = pCollExp[0]->GetPointsKeys();
+        int nElmts                            = pCollExp.size();
+        int npts                              = pCollExp[0]->GetTotPoints();
+
+        // copy Jacobians into a continuous list and set new chatched value
+        Array<OneD, NekDouble> newjac(npts * nElmts), tmp;
+        int cnt = 0;
+        for (int i = 0; i < nElmts; ++i)
+        {
+            const Array<OneD, const NekDouble> jac =
+                pCollExp[i]->GetGeomFactors()->GetJac();
+
+            if (pCollExp[i]->GetGeomFactors()->GetGtype() ==
+                SpatialDomains::eDeformed)
+            {
+                Vmath::Vcopy(npts, &jac[0], 1, &newjac[cnt], 1);
+            }
+            else
+            {
+                Vmath::Fill(npts, jac[0], &newjac[cnt], 1);
+            }
+
+            pCollExp[0]->MultiplyByStdQuadratureMetric(newjac + cnt,
+                                                       tmp = newjac + cnt);
+            cnt += npts;
+        }
+
+        m_oneDGeomData[eJacWithStdWeights] = newjac;
+    }
+
+    return m_oneDGeomData[eJacWithStdWeights];
+}
+
+const Array<TwoD, const NekDouble> &CoalescedGeomData::GetDerivFactors(
+    vector<LocalRegions::ExpansionSharedPtr> &pCollExp)
+{
+    if (m_twoDGeomData.count(eDerivFactors) == 0)
+    {
+        LibUtilities::PointsKeyVector ptsKeys = pCollExp[0]->GetPointsKeys();
+
+        int nElmts        = pCollExp.size();
+        int npts          = pCollExp[0]->GetTotPoints();
+        const int coordim = pCollExp[0]->GetCoordim();
+        int dim           = ptsKeys.size();
+
+        // set up Cached Jacobians to be continuous
+        Array<TwoD, NekDouble> newDFac;
+
+        if (IsDeformed(pCollExp))
+        {
+            newDFac = Array<TwoD, NekDouble>(dim * coordim, npts * nElmts);
+        }
+        else
+        {
+            newDFac = Array<TwoD, NekDouble>(dim * coordim, nElmts);
+        }
+
+        // copy Jacobians into a continuous list and set new chatched value
+        int cnt = 0;
+        for (int i = 0; i < nElmts; ++i)
+        {
+            const Array<TwoD, const NekDouble> Dfac =
+                pCollExp[i]->GetGeomFactors()->GetDerivFactors();
+
+            if (IsDeformed(pCollExp))
+            {
+                for (int j = 0; j < dim * coordim; ++j)
+                {
+                    Vmath::Vcopy(npts, &Dfac[j][0], 1, &newDFac[j][cnt], 1);
+                }
+            }
+            else
+            {
+                for (int j = 0; j < dim * coordim; ++j)
+                {
+                    newDFac[j][i] = Dfac[j][0];
+                }
+            }
+            cnt += npts;
+        }
+
+        m_twoDGeomData[eDerivFactors] = newDFac;
+    }
+
+    return m_twoDGeomData[eDerivFactors];
+}
+
+const std::shared_ptr<VecVec_t> CoalescedGeomData::GetDerivFactorsInterLeave(
+    vector<LocalRegions::ExpansionSharedPtr> &pCollExp, int nElmt)
+{
+    if (m_twoDGeomDataInterLeave.count(eDerivFactors) == 0)
+    {
+        ASSERTL1(nElmt % vec_t::width == 0,
+                 "Number of elements not divisible by vector "
+                 "width, padding not yet implemented.");
+
+        int nBlocks = nElmt / vec_t::width;
+
+        LibUtilities::PointsKeyVector ptsKeys = pCollExp[0]->GetPointsKeys();
+        const int coordim                     = pCollExp[0]->GetCoordim();
+        int dim                               = ptsKeys.size();
+
+        unsigned int n_df = coordim * dim;
+        alignas(vec_t::alignment) NekDouble vec[vec_t::width];
+
+        const Array<TwoD, const NekDouble> df = GetDerivFactors(pCollExp);
+        int dfsize                            = df.GetColumns();
+
+        VecVec_t newdf;
+
+        int npts = pCollExp[0]->GetTotPoints();
+
+        if (IsDeformed(pCollExp))
+        {
+            newdf.resize(nBlocks * n_df * npts);
+            auto *df_ptr = &newdf[0];
+            for (int e = 0; e < nBlocks; ++e)
+            {
+                for (int q = 0; q < npts; q++)
+                {
+                    for (int dir = 0; dir < n_df; ++dir, ++df_ptr)
+                    {
+                        for (int j = 0; j < vec_t::width; ++j)
+                        {
+                            // manage padding
+                            if ((vec_t::width * e + j) * npts + q < dfsize)
+                            {
+                                vec[j] =
+                                    df[dir][(vec_t::width * e + j) * npts + q];
+                            }
+                            else
+                            {
+                                vec[j] = 0.0;
+                            }
+                        }
+                        (*df_ptr).load(&vec[0]);
+                    }
+                }
+            }
+        }
+        else
+        {
+            newdf.resize(nBlocks * n_df);
+            for (int e = 0; e < nBlocks; ++e)
+            {
+                for (int dir = 0; dir < n_df; ++dir)
+                {
+                    for (int j = 0; j < vec_t::width; ++j)
+                    {
+                        // padding
+                        if (vec_t::width * e + j < dfsize)
+                        {
+                            vec[j] = df[dir][vec_t::width * e + j];
+                        }
+                        else
+                        {
+                            vec[j] = 0.0;
+                        }
+                    }
+                    // Must have all vec_t::width elemnts aligned to do a load.
+                    newdf[e * n_df + dir].load(&vec[0]);
+                }
+            }
+        }
+
+        m_twoDGeomDataInterLeave[eDerivFactors] =
+            MemoryManager<VecVec_t>::AllocateSharedPtr(newdf);
+    }
+
+    return m_twoDGeomDataInterLeave[eDerivFactors];
+}
+
+bool CoalescedGeomData::IsDeformed(
+    vector<LocalRegions::ExpansionSharedPtr> &pCollExp)
+{
+    return pCollExp[0]->GetGeomFactors()->GetGtype() ==
+           SpatialDomains::eDeformed;
+}
+
+} // namespace Nektar::Collections

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<NEKTAR>
+    <EXPANSIONS>
+        <E COMPOSITE="C[5]" NUMMODES="3" TYPE="GLL_LAGRANGE" FIELDS="u,v,w,theta,p" />
+    </EXPANSIONS>
+
+    <CONDITIONS>
+
+        <SOLVERINFO>
+            <I PROPERTY="SolverType"                    VALUE="VelocityCorrectionScheme"    />
+            <I PROPERTY="EQTYPE"                        VALUE="UnsteadyNavierStokes"        />
+            <I PROPERTY="EvolutionOperator"             VALUE="Nonlinear"                   />
+            <I PROPERTY="Projection"                    VALUE="Galerkin"                    />
+            <I PROPERTY="GlobalSysSoln"                 VALUE="DirectStaticCond"            />
+            <I PROPERTY="Driver"                        VALUE="Standard"                    />
+            <I PROPERTY="SPECTRALHPDEALIASING"          VALUE="True"                        />
+        </SOLVERINFO>
+
+        <TIMEINTEGRATIONSCHEME>
+            <METHOD> IMEX </METHOD>
+            <ORDER> 2 </ORDER>
+        </TIMEINTEGRATIONSCHEME>
+
+        <PARAMETERS>
+            <!-- Need to pick Delta t strategically, dont want CFL number to be too large! -->
+            <P> TimeStep       = 1e-1           </P>
+
+            <!--  Final time -->
+            <P> T              = 100            </P>
+            <P> NumSteps       = T/TimeStep     </P>
+            <P> IO_InfoSteps   = 1/TimeStep     </P>
+            <P> IO_CFLSteps    = 1/TimeStep     </P>
+
+            <!-- Reynolds number -->
+            <P> Re             = 1              </P>
+            <P> Kinvis         = 1/Re           </P>
+            <P> Flowrate       = 2/3            </P>
+
+            <!-- Heating parameters  -->
+            <P> Ra            = 2000/8          </P>
+            <P> Pr            = 1               </P>
+
+            <!-- Quasi-3D params -->
+            <P> LZ            = PI              </P>
+            <P> HomModesZ     = 2               </P>
+        </PARAMETERS>
+
+
+        <VARIABLES>
+            <V ID="0">u</V>
+            <V ID="1">v</V>
+            <V ID="2">w</V>
+            <V ID="3">theta</V>
+            <V ID="4">p</V>
+        </VARIABLES>
+
+        <BOUNDARYREGIONS>
+            <B ID="0"> C[1]   </B>   <!-- Inlet  -->
+            <B ID="1"> C[2]   </B>   <!-- Outlet -->
+            <B ID="2"> C[3]   </B>   <!-- Top    -->
+            <B ID="3"> C[4]   </B>   <!-- Bot    -->
+        </BOUNDARYREGIONS>
+
+        <BOUNDARYCONDITIONS>
+            <REGION REF="0">
+                <P VAR="u"      VALUE="[1]" />
+                <P VAR="v"      VALUE="[1]" />
+                <P VAR="w"      VALUE="[1]" />
+                <P VAR="theta"  VALUE="[1]" />
+                <P VAR="p"      VALUE="[1]" />
+            </REGION>
+            <REGION REF="1">
+                <P VAR="u"      USERDEFINEDTYPE="Flowrate" VALUE="[0]" />
+                <P VAR="v"      VALUE="[0]" />
+                <P VAR="w"      VALUE="[0]" />
+                <P VAR="theta"  VALUE="[0]" />
+                <P VAR="p"      VALUE="[0]" />
+            </REGION>
+            <REGION REF="2">
+                <D VAR="u"      VALUE="0" />
+                <D VAR="v"      VALUE="0" />
+                <D VAR="w"      VALUE="0" />
+                <D VAR="theta"  VALUE="0" />
+                <N VAR="p"      USERDEFINEDTYPE="H" VALUE="0"/>
+            </REGION>
+            <REGION REF="3">
+                <D VAR="u"      VALUE="0" />
+                <D VAR="v"      VALUE="0" />
+                <D VAR="w"      VALUE="0" />
+                <D VAR="theta"  VALUE="1" />
+                <N VAR="p"      USERDEFINEDTYPE="H" VALUE="0"/>
+            </REGION>
+        </BOUNDARYCONDITIONS>
+
+        <FUNCTION NAME="DiffusionCoefficient" >
+            <E VAR="theta" VALUE="1/Re/Pr" />
+        </FUNCTION>
+
+        <FUNCTION NAME="FlowrateForce" >
+            <E VAR="ForceX" VALUE="1" />
+            <E VAR="ForceY" VALUE="0" />
+            <E VAR="ForceZ" VALUE="0" />
+        </FUNCTION>
+
+        <FUNCTION NAME="BodyForce">
+            <E VAR="u"          VALUE="0"                   EVARS="u v w theta" />
+            <E VAR="v"          VALUE="Ra/Pr/Re/Re*theta"   EVARS="u v w theta" />
+            <E VAR="w"          VALUE="0"                   EVARS="u v w theta" />
+            <E VAR="theta"      VALUE="0"                   EVARS="u v w theta"/>
+        </FUNCTION>
+
+        <FUNCTION NAME="InitialConditions">
+            <F VAR="u,v,theta,p" FILE="ScaleReynoldsShearFilter_ThermalChannel3DH1D.rst"/>
+            <E VAR="w" VALUE="0"/>
+        </FUNCTION>
+
+    </CONDITIONS>
+    <FORCING>
+        <FORCE TYPE="Body">
+            <BODYFORCE>BodyForce</BODYFORCE>
+        </FORCE>
+    </FORCING>
+
+    <FILTERS>
+        <FILTER TYPE="ReynoldsStresses">
+            <PARAM NAME="SampleFrequency">5</PARAM>
+            <PARAM NAME="OutputFrequency">100/TimeStep</PARAM>
+            <PARAM NAME="ScaleNumModes">1.4</PARAM>
+        </FILTER>
+    </FILTERS>
+    <GEOMETRY DIM="2" SPACE="2">
+        <VERTEX COMPRESSED="B64Z-LittleEndian" BITSIZE="64">eJxtl39MlHUcxx8JvMgwApHj58EBcoKX/Li0IPkRaBZIqZgEGWjeD1KviwKhrS2xdlaAiRKyHWlilH/U5nTEzrR0lUCz2ebmH64/ZJe3YTkrdBKI6X3ezyc+dz7/vBivfZ67ez3P3fP9Ksr9juvfqX/NApsze5sWx10o9PdB4FcG8kEZo+tbC66xf8DvzC2Z0geD7/rO7wk4fwj4noG80yDnZ4OLTlzNPmu4FjCvAY8PkA9Ll/MPggd85x8PmA8F96WR358m5x8C9zaUVk4mTwTMzwFP28knpsr5h0H9wXvvbzpgPgyM6yXfr5fzc0Gvbdg53D2ryH/+EfBbK3ljspwPBy/ddt39fMEB84+CMfADOjkfAY53Osxdn84OmI8Ev4DPT5Tz80Ct8V6f0ID5KD//Q7ycnw9Wp9D9d8G4pm2HZ4x9tCKPlbnSa8Hzerq/6gzSx4CZX9P984de+lhwREf3R3OC9HFgi5Wuf7BW+nhwVTdd344I6RPAVjNdv9gw6RPBzyfp+vRrpNeBc9HfFCR9ktoBfU9NrRY+Gfwzhvoe3anfUnfTw16vyOPtPdKngINa6jvWKH0qGHmA+ibZpE8D26Oob1W19AvA/dXUt6Nc+nQwvJ36/lQgvQHcvZH6TmdJvxCcP0F9l6RInwEG7aG+W6OkzwTVvoc10i8Cy+dQ30H7jZHJHRfZG2VepbZP+sfUzxdKfaPzpF8MHnJS38YQ6bPAz0Ko7y/nx4XPBl0rqG+mS/octdM71NdplT4XdNRQ3ys50pvA+BvUt2j6H+EfBzfvpr69w9IvAdW+t/ZJvxTsu+Xy9XU4LJZqd+dJ1T8h89Lzrr6b/ZNghO/9eQprh3p6jkS3sc8DB+qpr/eoxWJxt7LPByv/cvn6HsqxWvrdDeyfAmON1Hf6zt3DmHVC9cvASzbqe+YTs2WBu0H9t1IAutZS34WxvtdnjweKEnqd+k5t6ulpiW5jXwRWtFPf76ssliZ3J/tiUO2LPuyfBsd/p764PurLKiWKPHB92JeC8y5TX1x/9svBn8uo72W6f9ivADW/Ud/3rdI/A+6NFPcv+5Xgh5XUF/c/+2fBoTLqi+8P++fAm2PUF98/9mVg/kfU122XvhxU++L7zX4VuO4i9cXvC/sKmVfB7wv758H6X6mvKUX6F8AaE/W9nSX9ajDpHPXF7yf7NWD3nRJf34/LpV8L9pVSX/x+s68E+5dTX51N+nXg1BXq622U/kWw9wPqe2yn9OtBtS+eT+yrQO856ptLz0f2L8m8Cp6P7KvVz3GW+n6pkfM1YGka9Y0Lk/5lcPQM9cXzn/0G8Ju/qW+QVvpXQHMe9W1KkL4WPFZMfbF+YV8HbvNQ3w0G6TeCHbuoL9ZX7DeBal+sr9i/CnYNUd9ltP5jv1mRB9Z37M3gwdPU97hOegs4GE99sb5lbwVjTlLfPr30NtB+lfompUpfD7pM1Bfrf/avgdsLqW94uvRbwIlR6rvLIP1W8F8n1s8Z0m8D1b7YP7G3gyM/umbuz9i/rtzv+N87wMOnXDP3X+zfAIu1Yn/FvgGMcLtm7p/Yvwn2ektm7o/YvwV2ZYv9D/tGsKJA7G/YN4FLR8X+hf128IhT7E/YN4N++w/2/wHDrXOi</VERTEX>
+        <EDGE COMPRESSED="B64Z-LittleEndian" BITSIZE="64">eJx11lV3nVUAhOFAcffihOBSXIK2UFyCS9ACwaW4u7u7u7u7u7v+GS6Y54JZK+fmXWe9s498s21g4L/XDAP/f3k/4zjvJ4zzfqDez1T0OTMX+Vnqc/lZy8vPNo6ffZzxc9Q4+TlrHD9XjefnHufz5qnP4+et8fx89T3y89f38AvUeH7B+n75her7+YVrPL9I/S75ifW7+EVrPL9Y/V75xev38kvUeH7J+h/yS9X/4Jeu8fwyof9nfg2GE8svG04oPxT63+bXcjWeXz70PMyjFSrHrxh6TubLSpXjVw49P/Nilcrxq4aeq/5Xqxy/euh563lS5fg1Qj3oc83K8WuF+tHb2pXj1wkHQ/2uWzl+vVCf+lk/HCq/Qdh9bxjqWW/DNZ7fKOz+N64cv0loXuht08rxm4Xmi942rxw/OTSP9DalcvwWofmlty0rx08NzTu9bVU5fuvQfNTbNpXjtw3N08Fwu8rx24fmr352CCeV3zEcKr9TaF7rbecaz4+E5rvedqkcv2toHehtt8rxu4fWh972qBy/Z2jd6G2vyvF7h9aT3vapHL9vaJ3pbbRy/H6h9ae3/SvHHxBal/o9sHL8QaH1qp+Dw+Hy08JJ5Q8JrWO9HVrj+cNC61tvY5XjDw+te70dUTn+yNB+oLejKscfHdon9HZM5fhjQ/uH3o6rHH98aF/R2wmV46eHU0K9nVg5/qTQPqTfkyvHnxLan/Rzaji1/GnhcPnTQ/uW3s6o8fyZof1Mb2dVjj87tM/p7ZzK8eeG9j+9nVc5/vzQvqi3CyrHXxjaL/V2UeX4i0P7qN4uqRx/aWh/nRJeVjn+8tC+q98rKsdfGdqP9XNVOFL+6nBq+WtC+7Terq3x/HWh/Vtv11eOvyG0r+vtxsrxN4X2e73dXDn+ltA5oLdbK8ffFjof9HZ75fg7QueG3u6sHH9X6DzR292V4+8JnTP6vbdy/H2h80c/94ej5R8IR8o/GDqX9PZQjecfDp1XenukcvyjoXNMb49Vjn88dL7p7YnK8U+Gzj29PVU5/unQeai3ZyrHPxtOC/X2XOX450Pnp95eqBz/Yuhc1e9LleNfDp23+nklHCv/ajha/rXQOay312s8/0bofNbbm5Xj3wqd23p7u3L8O6HzXG/vVo5/L3TO6+39yvEfhM5/vX1YOf6j0L1gWvhx5fhPQvcFvX1aOf6z0D1Cv59Xjv8idL/Qz5fh9PJfhWPlvw7dO/T2TY3nvw3dR/T2XeX470P3FL39UDn+x9D9RW8/VY7/OXSv0dsvleN/Dd139PZb5fjfQ/cgvf1ROf7P0P1Ib39Vjv87dG/S7z+V4/8F2ljE+gAA</EDGE>
+        <ELEMENT>
+            <Q COMPRESSED="B64Z-LittleEndian" BITSIZE="64">eJx1lum3zXUYR2VIlAwhsytFIlGRCDdDZUxJkXmexyJliijRIIqQIWOETImIi5ChMkTFP+PN3i981nLf7LUu+55z9u/7fZ5TrNidP/fA4rBE/L4kLAXvvYtXGt4Hy4Tn3y0L74cPhOfrlYMPwvLh+XcrwIqwUni+34dgZVglPN9/VfgwrBae77M6rAFrhufnrwVrwzrh2cOOdWEBrAf93H6eR2D98Ozp6z8KHwuvXPz/BrBheNn/cdgoPP/d/k/AxuH5vOzfBD4Zns/F/k3hU+H5evZvBpuH5/O3/9PwmfB8zgXwWdgCtoz3b//nYKvwPE/2fx62Ds9zY/828IXw7GH/trBdeJ5P+7eHheF5Du3/IuwQnn3t3xF2Cs/zbv/O8KXwvA/2fxm+Ep7Py/5dYFfYDXr+7d8d9givANq/J3w1PO+d/XvB18LzPtn/ddg7PM9JIXwD9gnPe2f/N+Fb4Xme7N8X9gvP+2n/t2H/8Dx39h8AB4bnPbb/IDgYDoGeT/sPhcPC877bfzgcEZ7n2P4j4ajwnAv2Hw3HhOd5t/9YOC4854f9x8MJ4Xkv7D8RTgrPOWP/yXBKeN4f+0+F08Jzjtn/HfgunA69Z/afAd8Lz7ll/5nw/fC8j/b/AM4Kz3lp/9lwTnjOQfvPhfPC837b/0M4Pzznpf0XwI/Ccw7YfyFcFJ5z1f4fw0/Cc17YfzH8FC6Bzl/7L4Wfhedcsf/n8IvwnNP2/xIuC68Q2v8ruDw857n9V8Cvw3NO2f8buDI85779V8Fvw3Oe2X81XBOe+8H+a+F34Tn37L8OrocboPvH/hvh9+E5H+2/CW4Oz31j/y1wa3jOUftvg9vDc8/Z/we4Izz3l/13wh/Dcy7bfxfcHZ57zv574E/hOb/tvxfuC899aP/98AA8CJ3z9v8ZHgrPvWn/X+Dh8NwH9j8Cfw3P/Wr/o/BYeO4N+/8Gj4fnHrb/CVgUnvvF/ifhqfDc1/Y/DX8Pzz1k/zPwbHjudfufg3/A89B9Zf8L8GJ4fm+w/yX4Z3juNfv/Bf8Oz+8J9r8Mr4Tn/rP/VXgtvCGwCP4Dr4fn9w7734D/huc+tf9/8P/w/H5i/5vwVni3AXULvdUA</Q>
+        </ELEMENT>
+        <COMPOSITE>
+            <C ID="1"> E[3,33,54,75,96,117,138,159,180,201] </C>
+            <C ID="2"> E[29,50,71,92,113,134,155,176,197,218] </C>
+            <C ID="3"> E[200,203,205,207,209,211,213,215,217,219] </C>
+            <C ID="4"> E[28,25,22,19,16,13,10,7,4,0] </C>
+            <C ID="5"> Q[0-99] </C>
+        </COMPOSITE>
+        <DOMAIN>
+            <D ID="0"> C[5] </D>
+        </DOMAIN>
+    </GEOMETRY>
+    <Metadata>
+        <Provenance>
+            <GitBranch>refs/heads/master</GitBranch>
+            <GitSHA1>53b8461d51fa8c83f563a9072764a9e7ebef339a</GitSHA1>
+            <Hostname>chanbuntu</Hostname>
+            <NektarVersion>5.7.0</NektarVersion>
+            <Timestamp>26-Nov-2024 00:25:47</Timestamp>
+        </Provenance>
+        <NekMeshCommandLine>-m peralign:surf1=1:surf2=2:dir=x Nx10-Ny10-Lx1.msh Nx10-Ny10-Lx1.xml </NekMeshCommandLine>
+    </Metadata>
+</NEKTAR>

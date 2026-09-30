@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<NEKTAR>
+    <Metadata>
+        <Provenance>
+            <GitBranch>refs/heads/feature/zero_mean_mode</GitBranch>
+            <GitSHA1>95f7c96a08b3fe457b152280295ffd80ea38900a</GitSHA1>
+            <Hostname>ae-gl19</Hostname>
+            <NektarVersion>5.3.0</NektarVersion>
+            <Timestamp>30-Oct-2023 00:22:16</Timestamp>
+        </Provenance>
+        <ChkFileNum>1</ChkFileNum>
+        <Kinvis>0.01</Kinvis>
+        <SessionName0>square_mix.opt</SessionName0>
+        <SessionName1>square_mix.xml</SessionName1>
+        <SessionName2>session_zero-homo-plane.xml</SessionName2>
+        <Time>5.0000000000000044</Time>
+        <TimeStep>0.001</TimeStep>
+    </Metadata>
+    <ELEMENTS FIELDS="u,v,w,p" SHAPE="Triangle-HomogenousExp1D" BASIS="Modified_A,Modified_B,Fourier" HOMOGENEOUSLENGTHS="1" HOMOGENEOUSZIDS="0,1,2,3" NUMMODESPERDIR="UNIORDER:3,3,4" ID="2-5" COMPRESSED="B64Z-LittleEndian" BITSIZE="64">eJx7oM4ABB/s9TkhNIhkkJu2t0kOwv9z7H7VhWdGe0G8Fb+XgunBBB5A3Q9zL4hEuPODvZbKg5NHI3sgfL5g2wFxJB4Acz+EB6Xh7oSJQ0BBUuegDf9Ll/8DwXuwexty1+9FSU/p6yD+AaargXElbhCV5rTlwKR62+1FgkyXjzywzdq5TtP44/O9uXcaL2ZPbtzL+P7C8WblJ3vTV8stSb+2fNC6H+ZedHf+S7noaRNwdW/azvbnTFevDVr3w/i43Jn5d4KPR9DNQev+qqtLDe0uPbB9k9KwgHXp072w9CRwRLNcOmrrXli6Gmj3joJRMAoQoP4AqN66v3+DOIj3YP8qri+ztTqm2n6YBxF3Ufw3Izi1aC/rusVRFmIzBl3+hbkf5l6YO3eagGQf7D8Tdty0XmL53n0ce//wZi0cdO0fmPth7oW58/WKf2Dxgi+3rT/+m7R35XQHtvOpOwdt+DOsh9CV5mxqKTOm28LSE1hR7rq9sHQ1oI7FAgDl3Pg3</ELEMENTS>
+    <ELEMENTS FIELDS="u,v,w,p" SHAPE="Quadrilateral-HomogenousExp1D" BASIS="Modified_A,Modified_A,Fourier" HOMOGENEOUSLENGTHS="1" HOMOGENEOUSZIDS="0,1,2,3" NUMMODESPERDIR="UNIORDER:3,3,4" ID="0-1" COMPRESSED="B64Z-LittleEndian" BITSIZE="64">eJzT52QAgg/2TXIQ+s+x+1UXnhntvXT5PxC8t3+gDhEHkQ256/eCaIbn/WC6K2HDXhfjufWGEy7aMgxTAAsXCO+DvZbKg5NHI3v2IocLjC5I6oSHC0z/ulWvOCcxrRm24bO9SJDp8pEHtrl3Gi9mT27cy/j+wvFm5Sd7q64uNbS79MA2Ks1py4FJ9bZvUhoWsC59ujfgUvyKqTrL955heHS3z6nBNiF16Qe3h6f3ErZpaAJYuMD4/1IuetoEXN0LCxeYeObfCT4eQTfh4QITP9x9qeeY3JRhGz6jYBRQAt4IgsgH+z/MA9VX9/e7KP6bEZxatJdjPYRffwBCV5qzqaXMmA7JV1aTbNnFpyeprpu/9+rhpRPiD+8ftvkLFi47TUC8B/vPhB03rZdYvhcWLq9X/APTK6c7sJ1P3bkXFi4m3TPcNe4s2zt356vte/kfD9v6CwCFWMUV</ELEMENTS>
+</NEKTAR>

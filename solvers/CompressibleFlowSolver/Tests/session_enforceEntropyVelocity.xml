@@ -1,0 +1,102 @@
+<!-- NACA-NLF-SectionD Normal-to-Leading-Edge direction - 2D compressible -->
+<?xml version="1.0" encoding="utf-8"?>
+<NEKTAR>
+    <EXPANSIONS>
+        <E COMPOSITE="C[100,101]" NUMMODES="4" FIELDS="rho,rhou,rhov,E" TYPE="MODIFIED" />
+    </EXPANSIONS>
+
+    <CONDITIONS>
+        <SOLVERINFO>
+            <I PROPERTY="EQType"                VALUE="NavierStokesImplicitCFE"/>
+            <I PROPERTY="Projection"            VALUE="DisContinuous"       />
+            <I PROPERTY="AdvectionType"         VALUE="WeakDG"              />
+            <I PROPERTY="DiffusionType"         VALUE="InteriorPenalty"     />
+            <I PROPERTY="AdvectionAdvancement"  VALUE="Implicit"            />
+            <I PROPERTY="DiffusionAdvancement"  VALUE="Implicit"            />
+            <I PROPERTY="UpwindType"            VALUE="Roe"                 />
+            <I PROPERTY="ProblemType"           VALUE="General"             />
+            <I PROPERTY="ViscosityType"         VALUE="Constant"            />
+        </SOLVERINFO>
+        <TIMEINTEGRATIONSCHEME>
+            <METHOD> DIRK </METHOD>
+            <ORDER> 2 </ORDER>
+        </TIMEINTEGRATIONSCHEME>
+        <PARAMETERS>
+            <!--Computational parameters-->
+            <P> TimeStep            = 0.05    			        </P>
+            <P> NumSteps            = 100    			        </P>
+            <P> IO_InfoSteps        = 100      		        	</P>
+            <P> IO_CFLSteps         = 100           			</P>
+            <!-- Fluid properties -->
+            <P> Gamma               = 1.4        			</P>
+            <P> Pr                  = 0.72         			</P>
+            <P> Mach                = 0.8        			</P>
+            <P> Re                  = 1.0e6      			</P>
+            <P> GasConstant         = 1/(Gamma*Mach*Mach)	        </P>
+            <P> mu	            = 1.0/Re    		</P>
+            <!-- Boundary condition parameters-->
+            <P> rhoInf              = 1.0          		   	</P>
+            <P> TInf                = 1.0          		   	</P>
+            <P> pInf   		    = rhoInf*GasConstant*TInf           </P>
+            <P> Tref                = 288.15                            </P> <!--[K]-->
+            <P> Twall               = 1.0            			</P>
+            <P> Lref                = 1.0            			</P>
+            <P> Uref		    = 1.0           			</P>
+            <P> uInf		    = 1.0            			</P>
+            <P> vInf	            = 0.0           			</P>
+        </PARAMETERS>
+
+        <VARIABLES>
+            <V ID="0"> rho  </V>
+            <V ID="1"> rhou </V>
+            <V ID="2"> rhov </V>
+            <V ID="3"> E    </V>
+        </VARIABLES>
+
+        <BOUNDARYREGIONS>
+            <B ID="0"> C[3] </B>  	<!-- bottom -->
+            <B ID="1"> C[1] </B>  	<!-- inflow -->
+            <B ID="2"> C[2] </B>  	<!-- outflow -->
+            <B ID="3"> C[4] </B>  	<!-- top -->
+        </BOUNDARYREGIONS>
+
+        <BOUNDARYCONDITIONS>
+            <!-- bottom -->
+            <REGION REF="0">
+                <P VAR="rho"  VALUE="[3]" />
+                <P VAR="rhou" VALUE="[3]" />
+                <P VAR="rhov" VALUE="[3]" />
+                <P VAR="E"    VALUE="[3]" />
+            </REGION>
+            <!-- freestream -->
+            <REGION REF="3">
+                <P VAR="rho"  VALUE="[0]" />
+                <P VAR="rhou" VALUE="[0]" />
+                <P VAR="rhov" VALUE="[0]" />
+                <P VAR="E"    VALUE="[0]" />
+            </REGION>
+            <!-- inflow -->
+            <REGION REF="1">
+                <D VAR="rho"  USERDEFINEDTYPE="EnforceEntropyVelocity" VALUE="rhoInf" />
+                <D VAR="rhou" USERDEFINEDTYPE="EnforceEntropyVelocity" VALUE="rhoInf*uInf" />
+                <D VAR="rhov" USERDEFINEDTYPE="EnforceEntropyVelocity" VALUE="rhoInf*vInf" />
+                <D VAR="E"    USERDEFINEDTYPE="EnforceEntropyVelocity" VALUE="pInf/(Gamma-1) + 0.5*rhoInf*(uInf*uInf + vInf*vInf)" />
+            </REGION>
+            <!-- outflow -->
+            <REGION REF="2">
+                <D VAR="rho"  USERDEFINEDTYPE="PressureOutflow" VALUE="0" />
+                <D VAR="rhou" USERDEFINEDTYPE="PressureOutflow" VALUE="0" />
+                <D VAR="rhov" USERDEFINEDTYPE="PressureOutflow" VALUE="0" />
+                <D VAR="E"    USERDEFINEDTYPE="PressureOutflow" VALUE="pInf" />
+            </REGION>
+        </BOUNDARYCONDITIONS>
+
+        <FUNCTION NAME="InitialConditions">
+            <E VAR="rho"  VALUE="rhoInf" />
+            <E VAR="rhou" VALUE="rhoInf*uInf" />
+            <E VAR="rhov" VALUE="rhoInf*vInf" />
+            <E VAR="E"    VALUE="pInf/(Gamma-1) + 0.5*rhoInf*(uInf*uInf + vInf*vInf)" />
+        </FUNCTION>
+
+    </CONDITIONS>
+</NEKTAR>

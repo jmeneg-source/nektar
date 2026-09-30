@@ -1,0 +1,261 @@
+--- configure	2009-07-12 11:36:42.000000000 +0100
++++ configure	2009-07-12 11:36:42.000000000 +0100
+@@ -3462,14 +3462,14 @@
+   ac_status=$?
+   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); }
+-{ (ac_try="$ac_compiler -V >&5"
++{ (ac_try="$ac_compiler --version >&5"
+ case "(($ac_try" in
+   *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+   *) ac_try_echo=$ac_try;;
+ esac
+ eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+ $as_echo "$ac_try_echo") >&5
+-  (eval "$ac_compiler -V >&5") 2>&5
++  (eval "$ac_compiler --version >&5") 2>&5
+   ac_status=$?
+   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); }
+@@ -6668,7 +6668,7 @@
+ esac
+ 
+ # If we're using GNU nm, then use its standard symbol codes.
+-case `$NM -V 2>&1` in
++case `$NM --version 2>&1` in
+ *GNU* | *'with BFD'*)
+   symcode='[ABCDGIRSTW]' ;;
+ esac
+@@ -8929,7 +8929,7 @@
+ 	lt_prog_compiler_static='-qstaticlink'
+ 	;;
+       *)
+-	case `$CC -V 2>&1 | sed 5q` in
++	case `$CC --version 2>&1 | sed 5q` in
+ 	*Sun\ C*)
+ 	  # Sun C 5.9
+ 	  lt_prog_compiler_pic='-KPIC'
+@@ -9486,7 +9486,7 @@
+ 	  tmp_sharedflag='-qmkshrobj'
+ 	  tmp_addflag= ;;
+ 	esac
+-	case `$CC -V 2>&1 | sed 5q` in
++	case `$CC --version 2>&1 | sed 5q` in
+ 	*Sun\ C*)			# Sun C 5.9
+ 	  whole_archive_flag_spec='${wl}--whole-archive`new_convenience=; for conv in $convenience\"\"; do test -z \"$conv\" || new_convenience=\"$new_convenience,$conv\"; done; $ECHO \"$new_convenience\"` ${wl}--no-whole-archive'
+ 	  compiler_needs_object=yes
+@@ -9635,7 +9635,7 @@
+       else
+ 	# If we're using GNU nm, then we don't want the "-C" option.
+ 	# -C means demangle to AIX nm, but means don't demangle with GNU nm
+-	if $NM -V 2>&1 | $GREP 'GNU' > /dev/null; then
++	if $NM --version 2>&1 | $GREP 'GNU' > /dev/null; then
+ 	  export_symbols_cmds='$NM -Bpg $libobjs $convenience | awk '\''{ if (((\$ 2 == "T") || (\$ 2 == "D") || (\$ 2 == "B")) && (substr(\$ 3,1,1) != ".")) { print \$ 3 } }'\'' | sort -u > $export_symbols'
+ 	else
+ 	  export_symbols_cmds='$NM -BCpg $libobjs $convenience | awk '\''{ if (((\$ 2 == "T") || (\$ 2 == "D") || (\$ 2 == "B")) && (substr(\$ 3,1,1) != ".")) { print \$ 3 } }'\'' | sort -u > $export_symbols'
+@@ -10209,7 +10209,7 @@
+ 	archive_expsym_cmds='echo "{ global:" > $lib.exp~cat $export_symbols | $SED -e "s/\(.*\)/\1;/" >> $lib.exp~echo "local: *; };" >> $lib.exp~
+ 	  $CC -shared ${wl}-z ${wl}text ${wl}-M ${wl}$lib.exp ${wl}-h ${wl}$soname -o $lib $libobjs $deplibs $compiler_flags~$RM $lib.exp'
+       else
+-	case `$CC -V 2>&1` in
++	case `$CC --version 2>&1` in
+ 	*"Compilers 5.0"*)
+ 	  wlarc=''
+ 	  archive_cmds='$LD -G${allow_undefined_flag} -h $soname -o $lib $libobjs $deplibs $linker_flags'
+@@ -12252,7 +12252,7 @@
+ old_striplib=
+ { $as_echo "$as_me:$LINENO: checking whether stripping libraries is possible" >&5
+ $as_echo_n "checking whether stripping libraries is possible... " >&6; }
+-if test -n "$STRIP" && $STRIP -V 2>&1 | $GREP "GNU strip" >/dev/null; then
++if test -n "$STRIP" && $STRIP --version 2>&1 | $GREP "GNU strip" >/dev/null; then
+   test -z "$old_striplib" && old_striplib="$STRIP --strip-debug"
+   test -z "$striplib" && striplib="$STRIP --strip-unneeded"
+   { $as_echo "$as_me:$LINENO: result: yes" >&5
+@@ -22552,14 +22552,14 @@
+   ac_status=$?
+   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); }
+-{ (ac_try="$ac_compiler -V >&5"
++{ (ac_try="$ac_compiler --version >&5"
+ case "(($ac_try" in
+   *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+   *) ac_try_echo=$ac_try;;
+ esac
+ eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+ $as_echo "$ac_try_echo") >&5
+-  (eval "$ac_compiler -V >&5") 2>&5
++  (eval "$ac_compiler --version >&5") 2>&5
+   ac_status=$?
+   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); }
+@@ -22819,14 +22819,14 @@
+   ac_status=$?
+   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); }
+-{ (ac_try="$ac_compiler -V >&5"
++{ (ac_try="$ac_compiler --version >&5"
+ case "(($ac_try" in
+   *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+   *) ac_try_echo=$ac_try;;
+ esac
+ eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+ $as_echo "$ac_try_echo") >&5
+-  (eval "$ac_compiler -V >&5") 2>&5
++  (eval "$ac_compiler --version >&5") 2>&5
+   ac_status=$?
+   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); }
+@@ -23279,7 +23279,7 @@
+ 	lt_prog_compiler_static_F77='-qstaticlink'
+ 	;;
+       *)
+-	case `$CC -V 2>&1 | sed 5q` in
++	case `$CC --version 2>&1 | sed 5q` in
+ 	*Sun\ C*)
+ 	  # Sun C 5.9
+ 	  lt_prog_compiler_pic_F77='-KPIC'
+@@ -23821,7 +23821,7 @@
+ 	  tmp_sharedflag='-qmkshrobj'
+ 	  tmp_addflag= ;;
+ 	esac
+-	case `$CC -V 2>&1 | sed 5q` in
++	case `$CC --version 2>&1 | sed 5q` in
+ 	*Sun\ C*)			# Sun C 5.9
+ 	  whole_archive_flag_spec_F77='${wl}--whole-archive`new_convenience=; for conv in $convenience\"\"; do test -z \"$conv\" || new_convenience=\"$new_convenience,$conv\"; done; $ECHO \"$new_convenience\"` ${wl}--no-whole-archive'
+ 	  compiler_needs_object_F77=yes
+@@ -23970,7 +23970,7 @@
+       else
+ 	# If we're using GNU nm, then we don't want the "-C" option.
+ 	# -C means demangle to AIX nm, but means don't demangle with GNU nm
+-	if $NM -V 2>&1 | $GREP 'GNU' > /dev/null; then
++	if $NM --version 2>&1 | $GREP 'GNU' > /dev/null; then
+ 	  export_symbols_cmds_F77='$NM -Bpg $libobjs $convenience | awk '\''{ if (((\$ 2 == "T") || (\$ 2 == "D") || (\$ 2 == "B")) && (substr(\$ 3,1,1) != ".")) { print \$ 3 } }'\'' | sort -u > $export_symbols'
+ 	else
+ 	  export_symbols_cmds_F77='$NM -BCpg $libobjs $convenience | awk '\''{ if (((\$ 2 == "T") || (\$ 2 == "D") || (\$ 2 == "B")) && (substr(\$ 3,1,1) != ".")) { print \$ 3 } }'\'' | sort -u > $export_symbols'
+@@ -24524,7 +24524,7 @@
+ 	archive_expsym_cmds_F77='echo "{ global:" > $lib.exp~cat $export_symbols | $SED -e "s/\(.*\)/\1;/" >> $lib.exp~echo "local: *; };" >> $lib.exp~
+ 	  $CC -shared ${wl}-z ${wl}text ${wl}-M ${wl}$lib.exp ${wl}-h ${wl}$soname -o $lib $libobjs $deplibs $compiler_flags~$RM $lib.exp'
+       else
+-	case `$CC -V 2>&1` in
++	case `$CC --version 2>&1` in
+ 	*"Compilers 5.0"*)
+ 	  wlarc=''
+ 	  archive_cmds_F77='$LD -G${allow_undefined_flag} -h $soname -o $lib $libobjs $deplibs $linker_flags'
+@@ -25588,7 +25588,7 @@
+        } && test -s conftest.$ac_objext; then
+   ac_cv_prog_f77_v=
+ # Try some options frequently used verbose output
+-for ac_verb in -v -verbose --verbose -V -\#\#\#; do
++for ac_verb in -v -verbose --verbose --version -\#\#\#; do
+   cat >conftest.$ac_ext <<_ACEOF
+       program main
+
+--- m4/libtool.m4	2009-04-07 22:40:40.000000000 +0100
++++ m4/libtool.m4	2009-04-07 22:40:40.000000000 +0100
+@@ -2002,7 +2002,7 @@
+ striplib=
+ old_striplib=
+ AC_MSG_CHECKING([whether stripping libraries is possible])
+-if test -n "$STRIP" && $STRIP -V 2>&1 | $GREP "GNU strip" >/dev/null; then
++if test -n "$STRIP" && $STRIP --version 2>&1 | $GREP "GNU strip" >/dev/null; then
+   test -z "$old_striplib" && old_striplib="$STRIP --strip-debug"
+   test -z "$striplib" && striplib="$STRIP --strip-unneeded"
+   AC_MSG_RESULT([yes])
+@@ -3369,7 +3369,7 @@
+ esac
+ 
+ # If we're using GNU nm, then use its standard symbol codes.
+-case `$NM -V 2>&1` in
++case `$NM --version 2>&1` in
+ *GNU* | *'with BFD'*)
+   symcode='[[ABCDGIRSTW]]' ;;
+ esac
+@@ -3745,7 +3745,7 @@
+ 	    _LT_TAGVAR(lt_prog_compiler_static, $1)='-qstaticlink'
+ 	    ;;
+ 	  *)
+-	    case `$CC -V 2>&1 | sed 5q` in
++	    case `$CC --version 2>&1 | sed 5q` in
+ 	    *Sun\ C*)
+ 	      # Sun C++ 5.9
+ 	      _LT_TAGVAR(lt_prog_compiler_pic, $1)='-KPIC'
+@@ -4029,7 +4029,7 @@
+ 	_LT_TAGVAR(lt_prog_compiler_static, $1)='-qstaticlink'
+ 	;;
+       *)
+-	case `$CC -V 2>&1 | sed 5q` in
++	case `$CC --version 2>&1 | sed 5q` in
+ 	*Sun\ C*)
+ 	  # Sun C 5.9
+ 	  _LT_TAGVAR(lt_prog_compiler_pic, $1)='-KPIC'
+@@ -4182,7 +4182,7 @@
+   aix[[4-9]]*)
+     # If we're using GNU nm, then we don't want the "-C" option.
+     # -C means demangle to AIX nm, but means don't demangle with GNU nm
+-    if $NM -V 2>&1 | $GREP 'GNU' > /dev/null; then
++    if $NM --version 2>&1 | $GREP 'GNU' > /dev/null; then
+       _LT_TAGVAR(export_symbols_cmds, $1)='$NM -Bpg $libobjs $convenience | awk '\''{ if (((\$ 2 == "T") || (\$ 2 == "D") || (\$ 2 == "B")) && ([substr](\$ 3,1,1) != ".")) { print \$ 3 } }'\'' | sort -u > $export_symbols'
+     else
+       _LT_TAGVAR(export_symbols_cmds, $1)='$NM -BCpg $libobjs $convenience | awk '\''{ if (((\$ 2 == "T") || (\$ 2 == "D") || (\$ 2 == "B")) && ([substr](\$ 3,1,1) != ".")) { print \$ 3 } }'\'' | sort -u > $export_symbols'
+@@ -4409,7 +4409,7 @@
+ 	  tmp_sharedflag='-qmkshrobj'
+ 	  tmp_addflag= ;;
+ 	esac
+-	case `$CC -V 2>&1 | sed 5q` in
++	case `$CC --version 2>&1 | sed 5q` in
+ 	*Sun\ C*)			# Sun C 5.9
+ 	  _LT_TAGVAR(whole_archive_flag_spec, $1)='${wl}--whole-archive`new_convenience=; for conv in $convenience\"\"; do test -z \"$conv\" || new_convenience=\"$new_convenience,$conv\"; done; $ECHO \"$new_convenience\"` ${wl}--no-whole-archive'
+ 	  _LT_TAGVAR(compiler_needs_object, $1)=yes
+@@ -4558,7 +4558,7 @@
+       else
+ 	# If we're using GNU nm, then we don't want the "-C" option.
+ 	# -C means demangle to AIX nm, but means don't demangle with GNU nm
+-	if $NM -V 2>&1 | $GREP 'GNU' > /dev/null; then
++	if $NM --version 2>&1 | $GREP 'GNU' > /dev/null; then
+ 	  _LT_TAGVAR(export_symbols_cmds, $1)='$NM -Bpg $libobjs $convenience | awk '\''{ if (((\$ 2 == "T") || (\$ 2 == "D") || (\$ 2 == "B")) && ([substr](\$ 3,1,1) != ".")) { print \$ 3 } }'\'' | sort -u > $export_symbols'
+ 	else
+ 	  _LT_TAGVAR(export_symbols_cmds, $1)='$NM -BCpg $libobjs $convenience | awk '\''{ if (((\$ 2 == "T") || (\$ 2 == "D") || (\$ 2 == "B")) && ([substr](\$ 3,1,1) != ".")) { print \$ 3 } }'\'' | sort -u > $export_symbols'
+@@ -4956,7 +4956,7 @@
+ 	_LT_TAGVAR(archive_expsym_cmds, $1)='echo "{ global:" > $lib.exp~cat $export_symbols | $SED -e "s/\(.*\)/\1;/" >> $lib.exp~echo "local: *; };" >> $lib.exp~
+ 	  $CC -shared ${wl}-z ${wl}text ${wl}-M ${wl}$lib.exp ${wl}-h ${wl}$soname -o $lib $libobjs $deplibs $compiler_flags~$RM $lib.exp'
+       else
+-	case `$CC -V 2>&1` in
++	case `$CC --version 2>&1` in
+ 	*"Compilers 5.0"*)
+ 	  wlarc=''
+ 	  _LT_TAGVAR(archive_cmds, $1)='$LD -G${allow_undefined_flag} -h $soname -o $lib $libobjs $deplibs $linker_flags'
+@@ -5893,7 +5893,7 @@
+ 	    # version 8.0 and above of icpc choke on multiply defined symbols
+ 	    # if we add $predep_objects and $postdep_objects, however 7.1 and
+ 	    # earlier do not add the objects themselves.
+-	    case `$CC -V 2>&1` in
++	    case `$CC --version 2>&1` in
+ 	      *"Version 7."*)
+ 	        _LT_TAGVAR(archive_cmds, $1)='$CC -shared $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags ${wl}-soname $wl$soname -o $lib'
+ 		_LT_TAGVAR(archive_expsym_cmds, $1)='$CC -shared $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags ${wl}-soname $wl$soname ${wl}-retain-symbols-file $wl$export_symbols -o $lib'
+@@ -5914,7 +5914,7 @@
+ 	    ;;
+           pgCC* | pgcpp*)
+             # Portland Group C++ compiler
+-	    case `$CC -V` in
++	    case `$CC --version` in
+ 	    *pgCC\ [[1-5]]* | *pgcpp\ [[1-5]]*)
+ 	      _LT_TAGVAR(prelink_cmds, $1)='tpldir=Template.dir~
+ 		rm -rf $tpldir~
+@@ -5976,7 +5976,7 @@
+ 	    fi
+ 	    ;;
+ 	  *)
+-	    case `$CC -V 2>&1 | sed 5q` in
++	    case `$CC --version 2>&1 | sed 5q` in
+ 	    *Sun\ C*)
+ 	      # Sun C++ 5.9
+ 	      _LT_TAGVAR(no_undefined_flag, $1)=' -zdefs'
+@@ -6509,7 +6509,7 @@
+   ;;
+ 
+ linux*)
+-  case `$CC -V 2>&1 | sed 5q` in
++  case `$CC --version 2>&1 | sed 5q` in
+   *Sun\ C*)
+     # Sun C++ 5.9

@@ -1,0 +1,13 @@
+ccache
+clang-18
+cmake
+g++
+lcov
+libboost-iostreams-dev
+libboost-program-options-dev
+libboost-system-dev
+liblapack-dev
+libscotch-dev
+libtinyxml-dev
+ninja-build
+zlib1g-dev

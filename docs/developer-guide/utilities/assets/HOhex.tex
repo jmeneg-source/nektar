@@ -1,0 +1,70 @@
+\newcommand{\nodeLabel}[3]{
+    \node[color=#3, fill=white] at (#1) {\fontsize{10}{10}\selectfont #2}
+}
+
+\newcommand{\drawEdge}[3]{%
+  \draw[->, color=red, thick] 
+    ($ (#1)!0.1!(#2) $)  -- ($ (#2)!0.1!(#1) $);
+  \nodeLabel{$(#1)!0.5!(#2)$}{#3}{red}
+}
+
+\newcommand{\drawQuadFace}[6]{
+    \coordinate (midMid) at ($  ($(#1) !0.5! (#2)$)  !0.5!  ($(#3) !0.5! (#4)$)  $);
+    \coordinate (l0) at ($ (#1) !#6! (midMid) $);
+    \coordinate (l1) at ($ (#2) !#6! (midMid) $);
+    \coordinate (l2) at ($ (#3) !#6! (midMid) $);
+    \coordinate (l3) at ($ (#4) !#6! (midMid) $);
+    \coordinate (l4) at ($ (l3) !0.33! (l0) $);
+    \node[color=blue] at (midMid) {\fontsize{10}{10}\selectfont #5};
+    \draw[->, color=blue, thick] (l0) -- (l1) -- (l2) -- (l3)-- (l4)
+}
+
+\tdplotsetmaincoords{65}{57}
+
+\begin{tikzpicture}[line join=bevel,tdplot_main_coords,scale=2.2,>=latex]
+  \coordinate (A) at (-1.2,-1.2,-1.2);
+  \coordinate (B) at ( 1.2,-1.2,-1.2);
+  \coordinate (C) at ( 1.2, 1.2,-1.2);
+  \coordinate (D) at (-1.2, 1.2,-1.2);
+  \coordinate (E) at (-1.2,-1.2, 1.2);
+  \coordinate (F) at ( 1.2,-1.2, 1.2);
+  \coordinate (G) at ( 1.2, 1.2, 1.2);
+  \coordinate (H) at (-1.2, 1.2, 1.2);
+
+  \draw[dashed,opacity=0.5] (A) -- (D) -- (C);
+  \draw[dashed,opacity=0.5] (D) -- (H);
+  \draw (A) -- (B) -- (F) -- (E) -- cycle;
+  \draw (F) -- (G) -- (C) -- (B);
+  \draw (E) -- (H) -- (G);
+
+  \drawEdge{C}{D}{2};
+  \drawEdge{D}{A}{3};
+  \drawEdge{D}{H}{7};
+
+  \drawQuadFace{A}{B}{C}{D}{0}{0.3};
+  \drawQuadFace{A}{B}{F}{E}{1}{0.35};
+  \drawQuadFace{B}{C}{G}{F}{2}{0.3};
+  \drawQuadFace{D}{C}{G}{H}{3}{0.3};
+  \drawQuadFace{A}{D}{H}{E}{4}{0.3};
+  \drawQuadFace{E}{F}{G}{H}{5}{0.3};
+  
+  \drawEdge{A}{B}{0};
+  \drawEdge{B}{C}{1};
+  \drawEdge{A}{E}{4};
+  \drawEdge{B}{F}{5};
+  \drawEdge{C}{G}{6};
+  \drawEdge{E}{F}{8};
+  \drawEdge{F}{G}{9};
+  \drawEdge{G}{H}{10};
+  \drawEdge{H}{E}{11};
+
+  \nodeLabel{A}{0}{black};
+  \nodeLabel{B}{1}{black};
+  \nodeLabel{C}{2}{black};
+  \nodeLabel{D}{3}{black};
+  \nodeLabel{E}{4}{black};
+  \nodeLabel{F}{5}{black};
+  \nodeLabel{G}{6}{black};
+  \nodeLabel{H}{7}{black};
+
+\end{tikzpicture}

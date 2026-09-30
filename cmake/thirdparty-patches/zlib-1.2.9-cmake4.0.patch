@@ -1,0 +1,8 @@
+--- zlib-1.2.9/CMakeLists.txt	2026-06-04 11:03:50.902996850 +0100
++++ CMakeLists.txt	2026-06-04 11:04:18.675960790 +0100
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 2.4.4)
++cmake_minimum_required(VERSION 3.5)
+ set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS ON)
+ 
+ project(zlib C)

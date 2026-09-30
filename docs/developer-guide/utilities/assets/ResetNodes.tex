@@ -1,0 +1,41 @@
+nodeID $\gets 0$ \Comment*[r]{stores the lowest available ID}
+revNodeID $\gets$ numNodes $ - 1$ \Comment*[r]{stores the highest available ID}
+
+\Comment{assign the apex node as the collapsed point and set the orientation of any prism lines that are connected to a pyramid tri face}
+\ForEach{pyramid : pyramids}{
+    \Comment{give the apex node the highest available ID}
+    \textit{apex node} $\gets$ revNodeID\;
+    revNodeID $\gets$ revNodeID - 1\;
+    
+    \ForEach{tri : pyramid tri faces}{
+        \If{tri is shared with another pyramid}{
+            \textbf{assert:} \textit{other pyramid shares the same apex node}\;
+        }\ElseIf{tri is shared with a prism}{
+            \textit{define the prism line}\;
+            \Comment{traverse the prism line, recursively assigning the highest available ID to the corresponding node}
+        }\Else{
+            \Comment{it is either shared with a tet or ends in free space}
+            continue\;
+        }
+    }
+}
+
+\Comment{set the orientation of the remaining prisms}
+\ForEach{prism : prisms}{
+    \If{any nodes have ID}{
+        \Comment{this prism has already been dealt with}
+        continue\;
+    }
+    \textit{create a list of the prisms in the prism line}\;
+    \textit{define the prism line}\;
+}
+
+\Comment{give the remaining nodes an ID (low to high)}
+\ForEach{node : nodes}{
+    \If{node has ID}{
+        continue\;
+    }
+    \Comment{Give node the lowest available ID}
+    \textit{node} $\gets$ nodeID\;
+    nodeID $\gets$ nodeID + 1\;
+}

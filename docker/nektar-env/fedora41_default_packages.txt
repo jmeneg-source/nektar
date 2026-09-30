@@ -1,0 +1,16 @@
+bison
+blas-devel
+boost-devel
+ccache
+cmake
+flex
+gcc-c++
+gcc-gfortran
+lapack-devel
+libXmu-devel
+make
+ninja-build
+patch
+tinyxml-devel
+zlib-devel
+zlib-static

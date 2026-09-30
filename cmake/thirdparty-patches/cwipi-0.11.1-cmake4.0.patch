@@ -1,0 +1,13 @@
+--- cwipi-0.11.1/CMakeLists.txt	2026-06-04 11:42:42.713308815 +0100
++++ cwipi-0.11.1/CMakeLists.txt	2026-06-04 11:42:42.713308815 +0100
+@@ -6,8 +6,8 @@
+ #
+ #==============================================================================
+ 
+-cmake_minimum_required(VERSION 3.0)
+-cmake_policy(VERSION 3.0)
++cmake_minimum_required(VERSION 3.5)
++cmake_policy(VERSION 3.5)
+ 
+ enable_testing()
+ 

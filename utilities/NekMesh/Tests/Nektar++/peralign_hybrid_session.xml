@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<NEKTAR>
+    <EXPANSIONS>
+        <E COMPOSITE="C[0,2]" NUMMODES="2" TYPE="MODIFIED" FIELDS="u" />
+    </EXPANSIONS>
+    <CONDITIONS>
+        <SOLVERINFO>
+            <I PROPERTY="EQTYPE"                     VALUE="Helmholtz"   />
+            <I PROPERTY="Projection"                 VALUE="Galerkin"    />
+            <I PROPERTY="GlobalSysSoln"              VALUE="IterativeStaticCond" />
+        </SOLVERINFO>
+
+        <PARAMETERS>
+            <P> TimeStep      = 5e-4 </P>
+            <P> T             = 5    </P>
+            <P> NumSteps      = 2    </P>
+            <P> IO_CheckSteps = 40   </P>
+            <P> IO_InfoSteps  = 10   </P>
+            <P> IO_CFLSteps   = 10    </P>
+            <P> Re            = 1e1  </P>
+            <P> Kinvis        = 1/Re </P>
+        </PARAMETERS>
+
+        <VARIABLES>
+            <V ID="0"> u </V>
+        </VARIABLES>
+
+        <BOUNDARYREGIONS>
+            <B ID="0"> C[7] </B>   <!-- Viscous wall blade        -->
+            <B ID="1"> C[6] </B>   <!-- Inflow                    -->
+            <B ID="2"> C[4] </B>   <!-- Outflow                   -->
+            <B ID="3"> C[8] </B>   <!-- Periodic - A              -->
+            <B ID="4"> C[9] </B>   <!-- Periodic - B              -->
+            <B ID="5"> C[3] </B>   <!-- Periodic - lower          -->
+            <B ID="6"> C[5] </B>   <!-- Periodic - upper          -->
+        </BOUNDARYREGIONS>
+
+        <BOUNDARYCONDITIONS>
+            <REGION REF="0">
+                <D VAR="u" VALUE="0" />
+            </REGION>
+            <REGION REF="1">
+                <D VAR="u" VALUE="0.7" />
+            </REGION>
+            <REGION REF="2">
+                <N VAR="u" USERDEFINEDTYPE="HOutflow" VALUE="0" />
+            </REGION>
+            <REGION REF="3">  <!-- Periodic (A) -->
+                <P VAR="u" VALUE="[4]" />
+            </REGION>
+            <REGION REF="4">  <!-- Periodic (B) -->
+                <P VAR="u" VALUE="[3]" />
+            </REGION>
+            <REGION REF="5">  <!-- Periodic (up) -->
+                <P VAR="u" VALUE="[6]" />
+            </REGION>
+            <REGION REF="6">  <!-- Periodic (low) -->
+                <P VAR="u" VALUE="[5]" />
+            </REGION>
+        </BOUNDARYCONDITIONS>
+
+        <FUNCTION NAME="Forcing">
+            <E VAR="u" VALUE="0.1" />
+        </FUNCTION>
+
+    </CONDITIONS>
+</NEKTAR>

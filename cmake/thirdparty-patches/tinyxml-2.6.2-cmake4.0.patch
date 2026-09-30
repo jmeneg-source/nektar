@@ -1,0 +1,8 @@
+--- tinyxml-2.6.2/CMakeLists.txt	2026-06-03 13:19:57.802436512 +0100
++++ tinyxml-2.6.2/CMakeLists.txt	2026-06-03 13:19:57.802436512 +0100
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 2.8)
++cmake_minimum_required(VERSION 3.5)
+ 
+ PROJECT(Tinyxml)
+ 

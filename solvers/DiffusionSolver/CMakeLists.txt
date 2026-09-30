@@ -1,0 +1,27 @@
+CMAKE_DEPENDENT_OPTION(NEKTAR_SOLVER_DIFFUSION
+    "Build the Diffusion Solver." ON
+    "NEKTAR_BUILD_SOLVERS" OFF)
+
+IF (NOT NEKTAR_BUILD_SOLVERS)
+    SET(NEKTAR_SOLVER_DIFFUSION OFF CACHE INTERNAL "")
+ENDIF()
+
+IF( NEKTAR_SOLVER_DIFFUSION )
+    ADD_SOLVER_EXECUTABLE(DiffusionSolver SOURCES DiffusionSolver.cpp)
+    ADD_SOLVER_EXECUTABLE(DiffusionSolverTimeInt SOURCES DiffusionSolverTimeInt.cpp COMPONENT diffusionsolver)
+    ADD_SOLVER_EXECUTABLE(MMFDiffusion SOURCES ./EquationSystems/MMFDiffusion.cpp)
+
+    ADD_NEKTAR_PERFORMANCE_TEST(Perf_TestMMFDiffCube)
+
+    IF(NEKTAR_BUILD_SOLVER_LIBS)
+        MESSAGE(WARNING, "Solver library build not set up for DiffusionSolver - skipping.")
+    ENDIF()
+
+    ADD_NEKTAR_TEST(ImDiffusion_m6)
+    ADD_NEKTAR_TEST(ImDiffusion_m6_time_int)
+    
+    #MMF Diffusion
+    ADD_NEKTAR_TEST(TestMMFDiffPlane)
+    ADD_NEKTAR_TEST(TestMMFDiffSphere)
+    ADD_NEKTAR_TEST(TestMMFDiffCube)
+ENDIF( NEKTAR_SOLVER_DIFFUSION )

@@ -1,0 +1,90 @@
+nektar++ (5.10.0-1) unstable; urgency=medium
+
+  * New upstream release. 
+
+ -- Chris Cantwell <c.cantwell@imperial.ac.uk>  Fri, 03 Jul 2026 14:07:58 +0100
+
+nektar++ (5.9.0-1) unstable; urgency=medium
+
+  * New upstream release. 
+
+ -- Chris Cantwell <c.cantwell@imperial.ac.uk>  Sun, 09 Nov 2025 18:00:00 +0000
+
+nektar++ (5.8.0-1) unstable; urgency=medium
+
+  * New upstream release. 
+
+ -- Chris Cantwell <c.cantwell@imperial.ac.uk>  Wed, 28 May 2025 18:08:51 +0100
+
+nektar++ (5.7.0-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Chris Cantwell <c.cantwell@imperial.ac.uk>  Tue, 29 Oct 2024 22:30:51 +0000
+
+nektar++ (5.6.0-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Chris Cantwell <c.cantwell@imperial.ac.uk>  Tue, 14 May 2024 08:29:00 +0100
+
+nektar++ (5.5.0-1) unstable; urgency=medium
+
+  * New upstream release. 
+
+ -- Chris Cantwell <c.cantwell@imperial.ac.uk>  Wed, 31 Jan 2024 08:52:50 +0000
+
+nektar++ (5.4.0-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Chris Cantwell <c.cantwell@imperial.ac.uk>  Thu, 12 Oct 2023 07:25:42 +0100
+
+nektar++ (5.3.0-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Chris Cantwell <c.cantwell@imperial.ac.uk>  Tue, 23 Sep 2022 08:00:00 +0100
+
+nektar++ (5.2.0-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Chris Cantwell <c.cantwell@imperial.ac.uk>  Tue, 23 Aug 2022 08:00:00 +0100
+
+nektar++ (5.1.0-1) unstable; urgency=medium
+
+  * New upstream release. 
+
+ -- Chris Cantwell <c.cantwell@imperial.ac.uk>  Fri, 05 Nov 2021 20:09:28 +0000
+
+nektar++ (5.0.3-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Chris Cantwell <c.cantwell@imperial.ac.uk>  Mon, 23 Aug 2021 06:18:54 +0100
+
+nektar++ (5.0.2-1) unstable; urgency=medium
+
+  * New upstream release. 
+
+ -- Chris Cantwell <c.cantwell@imperial.ac.uk>  Wed, 21 Apr 2021 13:49:40 +0100
+
+nektar++ (5.0.1-1) unstable; urgency=medium
+
+  * New upstream release. 
+
+ -- Chris Cantwell <c.cantwell@imperial.ac.uk>  Mon, 17 Aug 2020 11:06:51 +0100
+
+nektar++ (5.0.0-2) unstable; urgency=medium
+
+  * Added NekMesh package
+
+ -- Chris Cantwell <c.cantwell@imperial.ac.uk>  Thu, 19 Dec 2019 20:50:48 +0000
+
+nektar++ (5.0.0-1) unstable; urgency=medium
+
+  * Initial Debian packaging
+
+ -- Chris Cantwell <c.cantwell@imperial.ac.uk>  Thu, 19 Dec 2019 20:48:51 +0000
+

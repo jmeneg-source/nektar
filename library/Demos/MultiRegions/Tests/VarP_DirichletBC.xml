@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<NEKTAR>
+    <EXPANSIONS>
+        <E COMPOSITE="C[7]"
+            NUMMODES="2"
+            TYPE="MODIFIED"
+            FIELDS="u"
+            REFIDS="0" />
+    </EXPANSIONS>
+
+    <REFINEMENTS>
+        <R REF="0"
+            TYPE="STANDARD"
+            RADIUS="0.1"
+            COORDINATE1="0.1,0.0,0.0"
+            COORDINATE2="0.1,0.01,0.0"
+            NUMMODES="3" />
+    </REFINEMENTS>
+
+    <CONDITIONS>
+        <SOLVERINFO>
+            <I PROPERTY="EQTYPE"         VALUE="Helmholtz"           />
+            <I PROPERTY="Projection"     VALUE="Continuous"          />
+            <I PROPERTY="GLOBALSYSSOLN"  VALUE="IterativeFull"          />
+        </SOLVERINFO>
+
+        <PARAMETERS>
+            <P> Lambda                   = 1    </P>
+        </PARAMETERS>
+
+        <VARIABLES>
+            <V ID="0"> u </V>
+        </VARIABLES>
+
+        <BOUNDARYREGIONS>
+            <B ID="0"> C[0] </B>
+            <B ID="1"> C[1] </B>
+            <B ID="2"> C[2] </B>
+            <B ID="3"> C[3] </B>
+        </BOUNDARYREGIONS>
+
+        <BOUNDARYCONDITIONS>
+            <REGION REF="0">
+                <D VAR="u" VALUE="1.0" />
+            </REGION>
+            <REGION REF="1">
+                <D VAR="u" VALUE="1.0" />
+            </REGION>
+            <REGION REF="2">
+                <D VAR="u" VALUE="1.0" />
+            </REGION>
+            <REGION REF="3">
+                <D VAR="u" VALUE="1.0" />
+            </REGION>
+        </BOUNDARYCONDITIONS>
+
+        <FUNCTION NAME="Forcing">
+            <E VAR="u" VALUE="-Lambda" />
+        </FUNCTION>
+
+        <FUNCTION NAME="ExactSolution">
+            <E VAR="u" VALUE="1" />
+        </FUNCTION>
+    </CONDITIONS>
+
+    <GEOMETRY DIM="3" SPACE="3">
+        <VERTEX>
+            <V ID="16">2.01768084e-01 2.04304834e-01 2.03401773e-01</V>
+            <V ID="122">0.00000000e+00 1.38837978e-01 2.47706275e-01</V>
+
+            <V ID="255">1.22008468e-01 0.00000000e+00 1.22008468e-01</V>
+            <V ID="261">1.22008468e-01 1.22008468e-01 0.00000000e+00</V>
+            <V ID="262">0.00000000e+00 1.22008467e-01 1.22008468e-01</V>
+            <V ID="303">0.00000000e+00 0.00000000e+00 1.66666667e-01</V>
+            <V ID="313">0.00000000e+00 1.66666667e-01 0.00000000e+00</V>
+            <V ID="315">1.66666667e-01 0.00000000e+00 0.00000000e+00</V>
+            <V ID="324">0.00000000e+00 0.00000000e+00 0.00000000e+00</V>
+        </VERTEX>
+        <EDGE>
+            <E ID="1153">122 255</E>
+            <E ID="1154">255 16</E>
+            <E ID="1186">261 16</E>
+            <E ID="1195">261 255</E>
+            <E ID="1185">261 262</E>
+            <E ID="1187">262 16</E>
+            <E ID="1195">261 255</E>
+            <E ID="1212">255 262</E>
+            <E ID="1213">262 122</E>
+            <E ID="1477">303 255</E>
+            <E ID="1478">303 122</E>
+            <E ID="1514">303 262</E>
+            <E ID="1523">313 261</E>
+            <E ID="1525">313 262</E>
+            <E ID="1542">261 315</E>
+            <E ID="1543">315 255</E>
+            <E ID="1596">324 261</E>
+            <E ID="1597">324 255</E>
+            <E ID="1598">262 324</E>
+            <E ID="1667">313 324</E>
+            <E ID="1689">324 315</E>
+            <E ID="1670">324 303</E>
+        </EDGE>
+        <FACE>
+            <T ID="1586">1195 1185 1212</T>
+            <T ID="1556">1195 1154 1186</T>
+            <T ID="1545">1185 1187 1186</T>
+            <T ID="1578">1212 1187 1154</T>
+            <T ID="2041">1477 1153 1478</T>
+            <T ID="2093">1477 1514 1212</T>
+            <T ID="2094">1478 1213 1514</T>
+            <T ID="1577">1153 1212 1213</T>
+            <T ID="2093">1477 1514 1212</T>
+            <T ID="2110">1523 1185 1525</T>
+            <T ID="2147">1542 1195 1543</T>
+            <T ID="2248">1596 1597 1195</T>
+            <T ID="2249">1596 1598 1185</T>
+            <T ID="2250">1597 1212 1598</T>
+            <T ID="2353">1667 1596 1523</T>
+            <T ID="2354">1667 1598 1525</T>
+            <T ID="2359">1670 1477 1597</T>
+            <T ID="2360">1670 1514 1598</T>
+            <T ID="2391">1689 1542 1596</T>
+            <T ID="2392">1689 1543 1597</T>
+        </FACE>
+        <ELEMENT>
+            <A ID="964">2248 2249 2250 1586 </A>
+            <A ID="1012">2353 2354 2249 2110 </A>
+            <A ID="1015">2359 2360 2093 2250 </A>
+            <A ID="1030">2391 2392 2147 2248 </A>
+        </ELEMENT>
+        <CURVED />
+        <COMPOSITE>
+            <C ID="0"> F[2392,2359] </C>
+            <C ID="1"> F[2354,2360] </C>
+            <C ID="2"> F[2353,2391] </C>
+            <C ID="3"> F[2093,1586,2147,2110] </C>
+            <C ID="7"> A[964,1012,1015,1030] </C>
+        </COMPOSITE>
+        <DOMAIN>
+            <D ID="0"> C[7] </D>
+        </DOMAIN>
+    </GEOMETRY>
+    <Metadata>
+        <Provenance>
+            <GitBranch>refs/heads/master</GitBranch>
+            <GitSHA1>e9fd84c5f1c32764df964ce5d256bae27a0b23a5</GitSHA1>
+            <Hostname>IC-T3697HJ6KR</Hostname>
+            <NektarVersion>5.7.0</NektarVersion>
+            <Timestamp>30-Nov-2024 13:48:11</Timestamp>
+        </Provenance>
+        <NekMeshCommandLine>small1.xml:xml:processall out.xml:xml:uncompress </NekMeshCommandLine>
+    </Metadata>
+</NEKTAR>

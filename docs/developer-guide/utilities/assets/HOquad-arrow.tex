@@ -1,0 +1,56 @@
+\newcommand{\nodeLabel}[3]{
+    \node[color=#3, fill=white, opacity=0.9] at (#1) {\fontsize{10}{10}\selectfont #2}
+}
+
+\newcommand{\drawQuad}[4]{
+    \coordinate (midMid) at ($  ($(#1) !0.5! (#2)$)  !0.5!  ($(#3) !0.5! (#4)$)  $);%
+    \coordinate (l0) at ($ (#1) !0.4! (midMid) $);%
+    \coordinate (l1) at ($ (#2) !0.4! (midMid) $);%
+    \coordinate (l2) at ($ (#3) !0.4! (midMid) $);%
+    \coordinate (l3) at ($ (#4) !0.4! (midMid) $);%
+    \coordinate (l4) at ($ (l3) !0.33! (l0) $);%
+    \draw[->, color=blue, thick] (l0) -- (l1) -- (l2) -- (l3) -- (l4)
+}
+
+\newcommand{\drawQuadFace}[5]{
+    \coordinate (midMid) at ($  ($(#1) !0.5! (#2)$)  !0.5!  ($(#3) !0.5! (#4)$)  $);%
+    \coordinate (l0) at ($ (#1) !0.4! (midMid) $);%
+    \coordinate (l1) at ($ (#2) !0.4! (midMid) $);%
+    \coordinate (l2) at ($ (#3) !0.4! (midMid) $);%
+    \coordinate (l3) at ($ (#4) !0.4! (midMid) $);%
+    \coordinate (l4) at ($ (l3) !0.33! (l0) $);%
+    \nodeLabel{midMid}{#5}{blue};%
+    \draw[->, color=blue, thick] (l0) -- (l1) -- (l2) -- (l3) -- (l4)%
+}
+
+\newcommand{\drawOffsetArrow}[2]{%
+  \draw[->, color=red, thick] 
+    ($ (#1)!0.1!(#2) $)  -- ($ (#2)!0.1!(#1) $)
+}
+
+\begin{tikzpicture}[line join=bevel,scale=2,>=latex]
+  \coordinate (n0) at (-1,-1);%
+  \coordinate (n1) at (1,-1);%
+  \coordinate (n2) at (1,1);%
+  \coordinate (n3) at (-1,1);%
+
+  \coordinate (l0) at (-0.75, -0.75);%
+  \coordinate (l1) at (0.75, -0.75);%
+  \coordinate (l2) at (0.75, 0.75);%
+  \coordinate (l3) at (-0.75, 0.75);%
+  \coordinate (l4) at (-0.75, 0.25);%
+  
+  
+  % \draw[thick] (n0) -- (n1) -- (n2) -- (n3) -- cycle;%
+  \drawOffsetArrow{n0}{n1};%
+  \drawOffsetArrow{n1}{n2};%
+  \drawOffsetArrow{n2}{n3};%
+  \drawOffsetArrow{n3}{n0};%
+  \drawQuad{n0}{n1}{n2}{n3};%
+
+  \nodeLabel{n0}{0}{black};%
+  \nodeLabel{n1}{1 }{black};%
+  \nodeLabel{n2}{2 }{black};%
+  \nodeLabel{n3}{3 }{black};%
+
+\end{tikzpicture}

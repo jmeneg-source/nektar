@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<NEKTAR>
+    <EXPANSIONS>
+        <E COMPOSITE="C[5]" NUMMODES="3, 3" BASISTYPE="Modified_A,Modified_A" POINTSTYPE="GaussLobattoLegendre,GaussLobattoLegendre"   NUMPOINTS="4,4" FIELDS="u,v" />
+        <E COMPOSITE="C[5]" NUMMODES="2, 2" BASISTYPE="Modified_A,Modified_A" POINTSTYPE="GaussLobattoLegendre,GaussLobattoLegendre"   NUMPOINTS="4,4" FIELDS="p" />
+        <E COMPOSITE="C[6]" NUMMODES="3, 3" BASISTYPE="Modified_A,Modified_B" POINTSTYPE="GaussLobattoLegendre,GaussRadauMAlpha1Beta0" NUMPOINTS="4,3" FIELDS="u,v" />
+        <E COMPOSITE="C[6]" NUMMODES="2, 2" BASISTYPE="Modified_A,Modified_B" POINTSTYPE="GaussLobattoLegendre,GaussRadauMAlpha1Beta0" NUMPOINTS="4,3" FIELDS="p" />
+    </EXPANSIONS>
+    <CONDITIONS>
+        <SOLVERINFO>
+            <I PROPERTY="SolverType"                    VALUE="PressDecompVCSFSI" />
+            <I PROPERTY="EQTYPE"                        VALUE="UnsteadyNavierStokes"     />
+            <I PROPERTY="EvolutionOperator"             VALUE="Nonlinear"                />
+            <I PROPERTY="Projection"                    VALUE="Continuous"                 />
+            <I PROPERTY="Driver"                        VALUE="Standard"                 />
+            <I PROPERTY="SpectralVanishingViscositySpectralHP"    VALUE="DGKernel"       />
+        </SOLVERINFO>
+
+        <TIMEINTEGRATIONSCHEME>
+            <METHOD> IMEX </METHOD>
+            <ORDER> 2 </ORDER>
+        </TIMEINTEGRATIONSCHEME>
+
+        <PARAMETERS>
+            <P> rhos        = 1.01  </P>
+            <P> Ga        = 138.  </P>
+
+            <P> Kinvis        = sqrt(rhos-1.)/Ga  </P>
+            <P> Mp  = rhos*PI*0.25                 </P>
+            <P> Ip  = Mp*0.125                 </P>
+
+            <P> Utest      = 0.1  </P>
+            <P> NadvD      = 0.01  </P>
+            <P> NperT        = 1000  </P>
+            <P> TimeStep      = 1./Utest/NperT </P>
+            <P> NumSteps      = NadvD*NperT </P>
+            <P> IO_InfoSteps  = 1000      </P>
+            <P> SVVDiffCoeff  = 0.1                 </P>
+            <P> NewmarkGamma  = 0.8                 </P>
+        </PARAMETERS>
+
+        <VARIABLES>
+            <V ID="0"> u </V>
+            <V ID="1"> v </V>
+            <V ID="2"> p </V>
+        </VARIABLES>
+
+        <BOUNDARYREGIONS>
+            <B ID="0"> C[0] </B>    <!-- Wall -->
+            <B ID="1"> C[1] </B>  <!-- inlet -->
+            <B ID="2"> C[2] </B>  <!-- outlet -->
+            <B ID="3"> C[3] </B>  <!-- sideup -->
+            <B ID="4"> C[4] </B>  <!-- sidedown -->
+        </BOUNDARYREGIONS>
+
+        <BOUNDARYCONDITIONS>
+            <REGION REF="0">
+                <D VAR="u" USERDEFINEDTYPE="MRFWallPressDecomp" VALUE="0" />
+                <D VAR="v" USERDEFINEDTYPE="MRFWallPressDecomp" VALUE="0" />
+                <N VAR="p" USERDEFINEDTYPE="MRFWallPressDecomp" VALUE="0" />
+            </REGION>
+            <REGION REF="1">
+                <D VAR="u" USERDEFINEDTYPE="MRFFar" VALUE="0" />
+                <D VAR="v" USERDEFINEDTYPE="MRFFar" VALUE="0" />
+                <N VAR="p" USERDEFINEDTYPE="H" VALUE="0" />
+            </REGION>
+            <REGION REF="2">
+                <D VAR="u" USERDEFINEDTYPE="MRFFar" VALUE="0" />
+                <D VAR="v" USERDEFINEDTYPE="MRFFar" VALUE="0" />
+                <N VAR="p" USERDEFINEDTYPE="H" VALUE="0" />
+            </REGION>
+            <REGION REF="3">
+                <D VAR="u" USERDEFINEDTYPE="MRFFar" VALUE="0" />
+                <D VAR="v" USERDEFINEDTYPE="MRFFar" VALUE="0" />
+                <N VAR="p" USERDEFINEDTYPE="H" VALUE="0" />
+            </REGION>
+            <REGION REF="4">
+                <D VAR="u" USERDEFINEDTYPE="MRFFar" VALUE="0" />
+                <D VAR="v" USERDEFINEDTYPE="MRFFar" VALUE="0" />
+                <N VAR="p" USERDEFINEDTYPE="H" VALUE="0" />
+            </REGION>
+        </BOUNDARYCONDITIONS>
+
+        <FUNCTION NAME="InitialConditions">
+            <F VAR="u,v,p" FILE="FreeFallCyl.rst" />
+        </FUNCTION>
+
+        <FUNCTION NAME="ExtForce">
+            <E VAR="Fx" VALUE="-(rhos-1.)*PI*0.25" />
+        </FUNCTION>
+
+    </CONDITIONS>
+
+    <FORCING>
+        <FORCE TYPE="MovingReferenceFrame">
+        </FORCE>
+    </FORCING>
+
+    <RIGIDSOLVER>
+        <MASS>     Mp </MASS>
+        <ROTATIONINERTIA>   Ip      </ROTATIONINERTIA>
+        <MOTIONPRESCRIBED>  0, 0 ,0 </MOTIONPRESCRIBED>
+        <EXTERNALFORCE>  ExtForce </EXTERNALFORCE>
+        <BOUNDARY> B[0] </BOUNDARY>
+        <OutputFile> bodyMotion.mrf </OutputFile>
+        <OutputFrequency> 1 </OutputFrequency>
+    </RIGIDSOLVER>
+
+    <FILTERS>
+        <FILTER TYPE="AeroForces">
+            <PARAM NAME="OutputFile">DragLiftn.frc</PARAM>
+            <PARAM NAME="OutputFrequency">1</PARAM>
+            <PARAM NAME="Boundary">B[0]</PARAM>
+        </FILTER>
+    </FILTERS>
+</NEKTAR>

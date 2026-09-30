@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<NEKTAR>
+    <GEOMETRY DIM="3" SPACE="3">
+        <VERTEX COMPRESSED="B64Z-LittleEndian" BITSIZE="64">eJx9lUtIVHEUxqcy0172GJ/ZZM5kT+2hluXVLzOzRDAxqFlFFAQpBnIiJi16DW3SXQxtWhQTtKlNi4EiiFq1D6JAaREUs2rTJnCK5nwTMpzz3xzu/Ob7ncO5c+eGQvkzGX7e//WaILTg+gIW6fXj+w//nkQRX2xwniWGn6dE65P5t+nXT6/iwfUzye+p86B/qcGZL3XnFyxz5xeUuf0F5coHP7ZFPmQn8Cg9XSbxs4X5lhucfVa4ecFK5XPx3HBN3QRmtdK/yuD0r3bzggrlsyW5oelfY/iilf41Bqd/rZsXrFPOvXGP9K83OP1hNy+oVM69cY/0Vxmc/mo3L6hRHsuMZMu76gP+TuivNTj9dW5esEH5zOizxs5UVcDP6a83OP0b3bwgorwjlMwOZ24UPZ+bDM7ToPVddKj5xbkpzMUulVbfuViYb7PBmW90+wuirl8QU17Zkvv9I3MFYa3sv8Xg7NPk5gVblbMv56B/m8Hp3+7mBTuUf8rNx8d+NgTcA/07DU7/LjcvaFY+OJCJJLO3iu5vi8F5dmtNtY5/PjlzE93fJu/1jY8W5ttjcOb3uv0F+1y/oJXfr82lX51OIKGV/dsMzj7tbl6wX3mP9uUc9B8wOP0dbl5wUPnL9lNvRt5HA+6B/kMGp7/TzQuCBfu8W3R/uwzO08378+9/7ba+Xy4X5oPBmT/s9hf0uH7BEeX598OUvh/+P1+9Bmefo25e0KecfTkH/ccMTn+/mxccV57/f20KuAf6Txic/gE3L/gDBiK2JwAA</VERTEX>
+        <EDGE COMPRESSED="B64Z-LittleEndian" BITSIZE="64">eJx1l1N7nFEUhadpUxtJnamd2kjapLZt27Zt27Zt2/o3vTnvRd/nmdycZ62z99orM99Z35lI5P+/DDHWOK0ZY+CIcCbx4Hjpw2eWLnVZpAufNYZuNunRn12Y+TlUz19O8czLJR343DF85ZEu/vKGlf8Lf/lUB59fuuwXCGu86gvKP/9nIWF0EuSf/UTV8bkUlh/4IvLD51VU/uCLqR++uHzw+ZaQT/iSwuglyT/fR1R++D5KqQ6+tHTZLyPf1JeVf77XcsLolJd/9iuojuegovzAV5Ifno/K8gdfRf3wVeWD56mafMInC6NXXf55/mrID89fTdXB15Iu+7Xlm/o68s9zXFcYnXryz3591fHcN9A8nvuGqoNvJP/sN5Z/6pvIB+enqTA6zeSf/RTVcd5ShTlvzeUDvkVY+RzoSwtrgurT5YNz21IYnVZhTdR+67CS15zzNsKc87ZhjRPfTjrRsLaXDnwH9ZMLHaUP30n98J3DyvuCHOkizPyuqidfuqkevrsw83sIk9M95Y+c7iUd8rW3+sm1PtKH7yt98q6f5sH3Vz/8APkgHwfKJ/wgYfQGC5OXQzSPvBwqHXJumPrJ5eHShx8hffJ6pObBj1I//Gj5IN/HyCf8WGH0xgmTQ+M1jxyaIB1yZaL6ea9MUj/vlcmqg58iP+xPlR/qp8kH76fpwujMkH/2Z6qOXJyleeTfbPWTZ3PCyrnlvThXmPfivLAmiZ8vHd6XC6QDv1D9vEcXSR9+sfrhl4SVPOG9u1SY+ctUz/t4uerhVwgzf6VwNKyr5I/8WC0dzv0a9XMPWCt9+HXS536wXvPgN6gffqN8cJ/YJJ/wm4XR2yJMfmzVPPJjm3Q499vVzz1mh/Thd0qf+80uzYPfrX74PfLBfWivfMLvE0ZvvzB5cEDzyIOD0uF8H1I/97DD6ucedkR18Eflh/1j8kP9cfngPndCGJ2T8s/+KdWRT6c1j3w6o37y6WxYObfcI88Jc488H9Zk8Rekw/3yonTgL6mfe+dl6cNfUT/81bCSJ6lhvSbM/Ouq5/56Q/XwN4WZf0uY/Lgtf+THHelw7u9Kh3vzPWHuzfelD/9APuh7KB/UP5If7t+PhdF5It/sP1Ud+fFM88iP5+rn3L+QDvf+l8Lc+19JH/61fND3Rj6ofys//H54J4zOe/lm/4PqyIOPmkcefFI/5/uzdPjd8kWY3y1fpQ//TT7o+y4f1P+QH37//BRG55d8s/9bdeTTH80jn/6qn3z6B/jtmjQA</EDGE>
+        <FACE>
+            <T COMPRESSED="B64Z-LittleEndian" BITSIZE="64">eJxd09WrlgkURnFbrFFULCxULGxFxRwDWwzsTuwaxsDCThS7Az06Y4vYWGMrOoqB8d94s9aFz7n58X2cs/Z+D+8uXOj3n+JYDItiESyBJeNzKSyHZbE0lo9uRSyDFaJbCf/AytGtEn9nrxpWje/tVcca0bVXC2tGr05060WvbnTrR6dBfG6ItaPXGBtF114TbBp/Z685NovvW0a3TXxuFd228blddNvHvA7R7YQtsGN0O2Nr7BLdbjG3O/aMef5+D+wV87Q39ol57tEXB+IA7Ir9cRAOxj9xCA7HYbGPd2V3ROzlHdkdGft6V3ZHYb/ojcHRMc/eWByHPo+9iTgBfS7vwO5kHIregd0p6P/Du7I7Nfa2Nx2nxV72ZuBM9HntzcZZOB69K7tzYx/vyu48nIS+53bnx9wF0V0c8xZGd0nM+yu6f6PPsxS9K+fNwWXo+5zzlqN35Tw7K3A1rsJFuBLX4NrorMONuCH29q7sbo69fQ/tbom9fI/sbo297G3Hbejz2NuBO2Oevd24C9ej75ndPbGPd2V3L25C78ruvtjL3gHcH/PsHcRD6PPYO4pHYp53Zfc4+rzeld0TsZfvod2T0TsV3TPo85yO7lk8jAXRPY/H8B/0rnLev+hdOc/eBfSuCuL3LuJVvBLPcRmv4XU8hzfwFt6MvezdQd9L59q7i97ZpejdQ+/Mfe/jw5hj9wE+ijnu/Rj/iznOtfsUvbPb0X2GvpfuYfc5+t659wt8HXPc+xW+iTnOfYvvYs6T6L5H30vn2P0fvTPn2P2A3tlL/IifY45zP+GXmOPeX/FbzLHzHX0fnWPnB3pXznGvn+hdOecX7KikrwAA</T>
+            <Q COMPRESSED="B64Z-LittleEndian" BITSIZE="64">eJx1lPfbz2UYho2XEMouM3urCCkV2TIqs+yR0RBZGZWissqWsl5Ky957NZSXUBL+m365zh+cx+H7y3k8n+e+7uu67+N4vsWK3fsrHpYIS+rMfemwTFgqLJDuAdUVqL5sWE45HpSee3QVwwrqj65AdeXl95ByPhxWUj3nKvKpLP+q8qd/tfuc0ZOvuvzweTSsFT6iPNTXVF0N+eGDvm5YR/7U11BdbX2vJ//HwvrKw7mh8jXQuZH86d9YOTmjJ18T6ejbPGwZNlMu2EJ1TZUbH/RtwtbKT76mqmul+8fl/0T4pHw4t1O+tiHzPXWf/u2l44yefB2Us6P8nw47qT/nZ+XzTMhcneVP/+eUhzN68j0fsocXwi5hV+Vpr/tuIfO8qBzdwx7qT55OukePT0/l7hX2DvuE/H921n2/cED4Usjc6Pqrrq/yDgxfVg7+P7vqHp9B4ash86Hrq7pXQvbB/9UQ5RusHBX1nX5DQ/aE/rVwRDhcufF9XXXDQvaFD/rR4Sj5kW+Y6kaGzM3/y1j5jpFfXX2n37iQfaGfGE4KJygPvm+obnzIvvBBPzWcErIv8o1X3eSQ/fCu35LvmyHztdF3+r0djg3fUd9p4bvKzXmGfKeH7Os9+dN/pnSc0ZNvVsjcs0Pe/RzlYb65If8T6PBh7vfDeeH8kPc/TfcfhB+FC5Ub3YeqWxCyr0Xhx8rB+5+pe3yWhItD9oNugeo+CdkH7+kz5fs0ZM5B+k6/z+WDfnm4MlwWsi98V6huqfrgg35V+GW4SPmWqu6LkP3wftfId3XIfKP1nX5rQ+ZGvyH8Klyv3PhuVN26kD3gg/6b8Gv5kW+d6japD+9pi3w3h+xhqr7Tb2vI3NvUd3tYGG7Qead8d4Ts4Vv50/+7cJPO6Mm3K2Q/34e8/x+Uhz38GPKu0OFDjp/Cn8PdIe+iUPf7wgPh3pA9oNuvuj0h+zgYHlIO3v8u3eNzNDwSMhe6Pao7HLIP8hwPeYfHQuY/qu+80xPyORmeCk/LZ5/uz8r3jOrPhefVnzyHdI+efBdC9oPvLyHv62LIHs7rO+/r15C5fwt/Dy/J55Tu/5TvH8p9OSxSf/Kc0z168l0JL8j3r5B3eTVkniJ9571dU47r4Y3wb/lc0v1N+f4Tsod/w1vqXyRyj558/4XMfTssDO8oD/PcDXn/6PD5H32p4IUA</Q>
+        </FACE>
+        <ELEMENT>
+            <R COMPRESSED="B64Z-LittleEndian" BITSIZE="64">eJxd1lW7llUYReEtJdJdImwJCaW7y8BASkIQUbokpVtCUARBQkS6G6RLpFP4S5yMccDcJ/fBd81n7TfmWm9Bwet/b2ARLIrF4vfiWALfjN9Lxpy3sFTMK41lYr2yWC7mmS8fc8xXwIpYCSvH/22+ClaNfDX0+qpjjZhXE2uh9+FtrB3zzL+DXpf5OlgXC/Fd9D6ar4f1I98AvV8N8b2Y1wgbo8+jCTaNeebfR+/7B9gs5jXHFuhzbYmtYp751ujzb4NtsR22j/V9rh2wI3aKvOv7vDtjF+yK3bA7+l71wJ7YK/K90ffPHvSJeR/iR+h75Xv0ccwz/wn6/prvi5/iZ/g5+p6b/wL7Rf5L9L31uvvHvAE4EO2J6wyKeeYHo30w/xUOwaE4DO2b+eH4deRHoL2yTyNj3jc4Cu2tffo25pkfjfb7O/w+5o3BsWhvx+H4mGd+AtrniTgJ7dPkWN/rnIJT0T6Zd/1CnIY/4HScgTPRfWMWzsY5kf8R3Z/s09yYNw/no/fdPi2IeeYXovuS+UW4GJfgUnQfNL8Ml0d+Bbrf2aeVMe8nXIXup/ZpdcwzvwbdJ82vxZ9xHa5H92Xzv+Cvkd+A7t/26beYtxE3ofuwffo95pnfjO67W/CPmLcVt6H7+3bcEfPM/4meHzvxL7RPu2J9e/E37kb7ZN71PQf24F7ch/vxAHpeHcRDeDjyR9DemT+Kx/A42jfPOfMn8GTk7Zvn2Sk8jWfwbKznuXkOz+M/kXc9z1fnXcCLeAntm+eu8y7jlcjbN8/nq3gNr+ONWM9z/Cbewn8j73qe6867jf/hHbRvnt/Ou4v3Im/f3Nfu4wN8iI9iPb8nHuMTfBp51/M74Rk+R/v0f6znd8kLfIn2ybzrvQJCKYe8</R>
+        </ELEMENT>
+        <COMPOSITE>
+            <C ID="1"> F[0,5,58,63,108,113,158,163] </C>
+            <C ID="2"> F[51,55,103,106,153,156,203,206] </C>
+            <C ID="3"> F[9,13,23,27,37,41,53,57] </C>
+            <C ID="4"> F[160,165,172,176,184,188,196,200] </C>
+            <C ID="5"> F[3,11,18,25,32,39,46,54,61,68,74,80,86,92,98,105,111,118,124,130,136,142,148,155,161,169,175,181,187,193,199,205] </C>
+            <C ID="6"> F[6,14,20,28,34,42,49,56,64,70,76,82,88,94,101,107,114,120,126,132,138,144,151,157,164,170,177,182,189,194,201,207] </C>
+            <C ID="7"> R[0-63] </C>
+        </COMPOSITE>
+        <DOMAIN>
+            <D ID="0"> C[7] </D>
+        </DOMAIN>
+    </GEOMETRY>
+
+    <EXPANSIONS>
+        <!-- To avoid SIP issues, use GL instead of GR in Tri/Tet/Prism/Pyr -->
+        <E COMPOSITE="C[7]" NUMMODES="3,3,3" FIELDS="rho,rhou,rhov,rhow,E" BASISTYPE="Modified_A,Modified_A,Modified_B"
+            NUMPOINTS="5,5,4" POINTSTYPE="GaussLegendreWithMP,GaussLegendreWithMP,GaussLegendreWithM"/>
+    </EXPANSIONS>
+
+    <CONDITIONS>
+        <SOLVERINFO>
+            <I PROPERTY="EQTYPE"                        VALUE="NavierStokesImplicitCFE" />
+            <I PROPERTY="Projection"                    VALUE="DisContinuous"           />
+            <I PROPERTY="AdvectioType"                  VALUE="WeakDG"                  />
+            <I PROPERTY="DiffusionType"                 VALUE="InteriorPenalty"         />
+            <I PROPERTY="AdvectionAdvancement"          VALUE="Implicit"                />
+            <I PROPERTY="DiffusionAdvancement"          VALUE="Implicit"                />
+            <I PROPERTY="UpwindType"                    VALUE="Roe"                     />
+            <I PROPERTY="ProblemType"                   VALUE="General"                 />
+            <I PROPERTY="ViscosityType"                 VALUE="Constant"                />
+            <I PROPERTY="EquationOfState"               VALUE="IdealGas"                />
+        </SOLVERINFO>
+
+        <TIMEINTEGRATIONSCHEME>
+            <METHOD> DIRK </METHOD>
+            <ORDER> 2 </ORDER>
+        </TIMEINTEGRATIONSCHEME>
+
+        <PARAMETERS>
+            <!-- Computational parameters -->
+            <P> TimeStep       = 5e-5                                </P>
+            <P> NumSteps       = 10                                  </P>
+            <P> IO_InfoSteps   = 1                                   </P>
+            <P> IO_CFLSteps    = 1                                   </P>
+
+            <!-- Fluid properties -->
+            <P> Re             = 1000                                </P>
+            <P> Mach           = 0.02                                </P> <!-- 9.22 m/s  -->
+            <P> Gamma          = 1.4                                 </P>
+            <P> Pr             = 0.72                                </P>
+            <P> L              = 0.1                                 </P>
+            <P> uRef           = 19.2895                             </P>
+
+            <!-- Boundary conditions parameters -->
+            <P> rhoInf         = 1.16305                             </P>
+            <P> pInf           = 100159.1                            </P>
+            <P> TInf           = pInf/(287.058*rhoInf)               </P>
+            <P> Twall          = 300                                 </P>
+            <P> GasConstant    = 287.058                             </P>
+            <P> cInf           = sqrt(Gamma*287.058*TInf)            </P>
+
+            <P> uInf           = -Mach*cInf                          </P> <!-- (Mach*cInf)/19.289-->
+            <P> vInf           = 0.0                                 </P>
+            <P> wInf           = 0.0                                 </P>
+            <P> mu             = rhoInf*uRef*L/Re                    </P>
+
+            <P> PreconItsStep             = 0                        </P>
+            <P> IPSymmFluxCoeff           = 1.0                      </P>
+            <P> NekLinSysMaxIterations    = 100                      </P>
+            <P> NekNonlinSysMaxIterations = 30                       </P>
+
+        </PARAMETERS>
+
+        <VARIABLES>
+            <V ID="0"> rho  </V>
+            <V ID="1"> rhou </V>
+            <V ID="2"> rhov </V>
+            <V ID="3"> rhow </V>
+            <V ID="4"> E    </V>
+        </VARIABLES>
+
+        <BOUNDARYREGIONS>
+            <B ID="0"> C[3]  </B>   <!-- Lower viscous wall -->
+            <B ID="1"> C[2]  </B>   <!-- Outflow            -->
+            <B ID="2"> C[4]  </B>   <!-- Inflow             -->
+            <B ID="3"> C[1]  </B>   <!-- Lower inviscid wall-->
+            <B ID="4"> C[5]  </B>   <!-- side z=0           -->
+            <B ID="5"> C[6]  </B>   <!-- side z=Lz          -->
+        </BOUNDARYREGIONS>
+
+        <BOUNDARYCONDITIONS>
+            <REGION REF="0"> <!-- Lower viscous wall -->
+                <D VAR="rho"  USERDEFINEDTYPE="WallViscous" VALUE="0" />
+                <D VAR="rhou" USERDEFINEDTYPE="WallViscous" VALUE="0" />
+                <D VAR="rhov" USERDEFINEDTYPE="WallViscous" VALUE="0" />
+                <D VAR="rhow" USERDEFINEDTYPE="WallViscous" VALUE="0" />
+                <D VAR="E"    USERDEFINEDTYPE="WallViscous" VALUE="0" />
+            </REGION>
+
+            <REGION REF="1"> <!-- Outflow -->
+                <D VAR="rho"  VALUE="rhoInf" />
+                <D VAR="rhou" VALUE="rhoInf*uInf" />
+                <D VAR="rhov" VALUE="rhoInf*vInf" />
+                <D VAR="rhow" VALUE="rhoInf*wInf" />
+                <D VAR="E"    VALUE="pInf/(Gamma - 1) + 0.5*rhoInf*(uInf*uInf + vInf*vInf)" />
+            </REGION>
+
+            <REGION REF="2"> <!-- Inflow -->
+                <D VAR="rho"  VALUE="rhoInf" />
+                <D VAR="rhou" VALUE="rhoInf*uInf" />
+                <D VAR="rhov" VALUE="rhoInf*vInf" />
+                <D VAR="rhow" VALUE="rhoInf*wInf" />
+                <D VAR="E"    VALUE="pInf/(Gamma - 1) + 0.5*rhoInf*(uInf*uInf + vInf*vInf)" />
+            </REGION>
+
+            <REGION REF="3"> <!-- Slip condition -->
+                <D VAR="rho"  USERDEFINEDTYPE="Symmetry" VALUE="0" />
+                <D VAR="rhou" USERDEFINEDTYPE="Symmetry" VALUE="0" />
+                <D VAR="rhov" USERDEFINEDTYPE="Symmetry" VALUE="0" />
+                <D VAR="rhow" USERDEFINEDTYPE="Symmetry" VALUE="0" />
+                <D VAR="E"    USERDEFINEDTYPE="Symmetry" VALUE="0" />
+            </REGION>
+
+            <REGION REF="4"> <!-- side z=0 -->
+                <D VAR="rho"  USERDEFINEDTYPE="Symmetry" VALUE="0" />
+                <D VAR="rhou" USERDEFINEDTYPE="Symmetry" VALUE="0" />
+                <D VAR="rhov" USERDEFINEDTYPE="Symmetry" VALUE="0" />
+                <D VAR="rhow" USERDEFINEDTYPE="Symmetry" VALUE="0" />
+                <D VAR="E"    USERDEFINEDTYPE="Symmetry" VALUE="0" />
+            </REGION>
+
+            <REGION REF="5"> <!-- side z=Lz -->
+                <D VAR="rho"  USERDEFINEDTYPE="Symmetry" VALUE="0" />
+                <D VAR="rhou" USERDEFINEDTYPE="Symmetry" VALUE="0" />
+                <D VAR="rhov" USERDEFINEDTYPE="Symmetry" VALUE="0" />
+                <D VAR="rhow" USERDEFINEDTYPE="Symmetry" VALUE="0" />
+                <D VAR="E"    USERDEFINEDTYPE="Symmetry" VALUE="0" />
+            </REGION>
+        </BOUNDARYCONDITIONS>
+
+        <FUNCTION NAME="InitialConditions"> <!-- Initial condition from .csv -->
+            <E VAR="rho"  VALUE="rhoInf" />
+            <E VAR="rhou" VALUE="rhoInf*uInf" />
+            <E VAR="rhov" VALUE="rhoInf*vInf" />
+            <E VAR="rhow" VALUE="rhoInf*wInf" />
+            <E VAR="E"    VALUE="pInf/(Gamma - 1) + 0.5*rhoInf*(uInf*uInf + vInf*vInf)" />
+        </FUNCTION>
+
+    </CONDITIONS>
+
+</NEKTAR>

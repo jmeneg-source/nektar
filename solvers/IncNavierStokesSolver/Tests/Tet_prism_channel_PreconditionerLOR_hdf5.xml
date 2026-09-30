@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<NEKTAR>
+    <GEOMETRY DIM="3" SPACE="3" HDF5FILE="Tet_prism_channel_PreconditionerLOR_hdf5.nekg" />
+    <Metadata>
+        <Provenance>
+            <GitBranch>refs/heads/feature/LOR</GitBranch>
+            <GitSHA1>3468bcd8e7152538d65c79b6fa6fd00a5abf84fd</GitSHA1>
+            <Hostname>M212193</Hostname>
+            <NektarVersion>5.6.0</NektarVersion>
+            <Timestamp>09-Oct-2024 19:53:58</Timestamp>
+        </Provenance>
+        <NekMeshCommandLine>Tet_prism_channel_rad.xml:xml:prismreorder Tet_prism_channel.xml -v</NekMeshCommandLine>
+    </Metadata>
+    <EXPANSIONS>
+        <E COMPOSITE="C[0]" NUMMODES="3" TYPE="MODIFIED" FIELDS="u,v,w,p" />
+        <E COMPOSITE="C[1]" NUMMODES="3" TYPE="MODIFIED" FIELDS="u,v,w,p" />
+    </EXPANSIONS>
+    <CONDITIONS>
+        <SOLVERINFO>
+            <I PROPERTY="SolverType" VALUE="VelocityCorrectionScheme" />
+            <I PROPERTY="EQTYPE" VALUE="UnsteadyNavierStokes" />
+            <I PROPERTY="AdvectionForm" VALUE="Convective" />
+            <I PROPERTY="Projection" VALUE="Galerkin" />
+            <I PROPERTY="SpectralHPDealiasing" VALUE="False" />
+        </SOLVERINFO>
+
+        <TIMEINTEGRATIONSCHEME>
+            <METHOD> IMEX </METHOD>
+            <ORDER> 1 </ORDER>
+        </TIMEINTEGRATIONSCHEME>
+
+        <GLOBALSYSSOLNINFO>
+            <V VAR="u,v,w">
+                <I PROPERTY="GlobalSysSoln"         VALUE="IterativeStaticCond"/>
+                <I PROPERTY="Preconditioner"        VALUE="LowEnergyBlock"/>
+                <I PROPERTY="AbsoluteTolerance"     VALUE="True"/>
+            </V>
+            <V VAR="p">
+                <I PROPERTY="GlobalSysSoln"         VALUE="IterativeFull"/>
+                <I PROPERTY="Preconditioner"        VALUE="LOR"/>
+                <I PROPERTY="AbsoluteTolerance"     VALUE="True"/>
+                <I PROPERTY="LinSysIterSolver" VALUE="GMRES" />
+                <I PROPERTY="LORPointDistribution" VALUE="GLL" />
+                <I PROPERTY="LORSimplex" VALUE="False" />
+                <I PROPERTY="LORSolverType" VALUE="PETScFull" />
+                <!-- <I PROPERTY="IterativeSolverTolerance" VALUE="1e-5"/> -->
+            </V>
+        </GLOBALSYSSOLNINFO>
+
+        <PARAMETERS>
+            <P> TimeStep      = 0.001 </P>
+            <P> NumSteps      = 10 </P>
+            <P> IO_CheckSteps = 10    </P>
+            <P> IO_InfoSteps  = 10    </P>
+            <P> Kinvis        = 1   </P>
+        </PARAMETERS>
+
+        <VARIABLES>
+            <V ID="0"> u </V>
+            <V ID="1"> v </V>
+            <V ID="2"> w </V>
+            <V ID="3"> p </V>
+        </VARIABLES>
+
+        <BOUNDARYREGIONS>
+            <B ID="0"> C[2] </B>    <!-- Inlet -->
+            <B ID="1"> C[3] </B>    <!-- Outlet -->
+            <B ID="2"> C[4-7] </B>  <!-- Wall -->
+        </BOUNDARYREGIONS>
+
+        <BOUNDARYCONDITIONS>
+            <REGION REF="0">
+                <D VAR="u" VALUE="0" />
+                <D VAR="v" VALUE="0" />
+                <D VAR="w" VALUE="y*(1-y)" />
+                <N VAR="p" USERDEFINEDTYPE="H" VALUE="0" />
+            </REGION>
+            <REGION REF="1">
+                <N VAR="u" VALUE="0" />
+                <N VAR="v" VALUE="0" />
+                <N VAR="w" VALUE="0" />
+                <D VAR="p" VALUE="0" />
+            </REGION>
+            <REGION REF="2">
+                <D VAR="u" VALUE="0" />
+                <D VAR="v" VALUE="0" />
+                <D VAR="w" VALUE="y*(1-y)" />
+                <N VAR="p" USERDEFINEDTYPE="H" VALUE="0" />
+            </REGION>
+        </BOUNDARYCONDITIONS>
+
+        <FUNCTION NAME="ExactSolution">
+            <E VAR="u" VALUE="0" />
+            <E VAR="v" VALUE="0" />
+            <E VAR="w" VALUE="y*(1-y)" />
+            <E VAR="p" VALUE="-2*Kinvis*(z-1)" />
+        </FUNCTION>
+
+        <FUNCTION NAME="InitialConditions">
+            <E VAR="u" VALUE="0" />
+            <E VAR="v" VALUE="0" />
+            <E VAR="w" VALUE="y*(1-y)" />
+            <E VAR="p" VALUE="-2*Kinvis*(z-1)" />
+        </FUNCTION>
+    </CONDITIONS>
+</NEKTAR>

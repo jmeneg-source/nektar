@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NEKTAR>
+    <EXPANSIONS>
+        <E COMPOSITE="C[100,101]" NUMMODES="3" FIELDS="u,v,w,p" TYPE="MODIFIED"            />
+    </EXPANSIONS>
+    <CONDITIONS>
+        <SOLVERINFO>
+            <I PROPERTY="SolverType"                           VALUE="VelocityCorrectionScheme" />
+            <I PROPERTY="EQTYPE"                               VALUE="UnsteadyNavierStokes"     />
+            <I PROPERTY="AdvectionForm"                        VALUE="Convective"               />
+            <I PROPERTY="Projection"                           VALUE="Galerkin"                 />
+            <I PROPERTY="SpectralhpDealiasing"                 VALUE="True"                     />
+            <I PROPERTY="SpectralVanishingViscositySpectralHP" VALUE="True"                     />
+            <I PROPERTY="SpectralVanishingViscosityHomo1D"     VALUE="True"                     />
+            <I PROPERTY="HOMOGENEOUS"                          VALUE="1D"                       />
+            <!--<I PROPERTY="UseFFT"                               VALUE="FFTW"                     />-->
+            <I PROPERTY="GlobalSysSoln"                        VALUE="XxtMultiLevelStaticCond"  />
+        </SOLVERINFO>
+        <TIMEINTEGRATIONSCHEME>
+            <METHOD> IMEX </METHOD>
+            <ORDER> 2 </ORDER>
+        </TIMEINTEGRATIONSCHEME>
+        <PARAMETERS>
+            <P> TimeStep        = 1.0e-3                 </P>
+            <P> NumSteps        = 5e3                    </P>
+            <P> IO_CheckSteps   = 1e4                    </P>
+            <P> IO_InfoSteps    = 1e3                    </P>
+            <P> IO_CFLSteps     = 1e3                    </P>
+            <P> Re              = 100.0                  </P>
+            <P> uInf            = 1.0                    </P>
+            <P> vInf            = 0.0                    </P>
+            <P> wInf            = 0.0                    </P>
+            <P> Kinvis          = 1.0/Re                 </P>
+            <P> LZ              = 1.0                    </P>
+            <P> HomModesZ       = 4                      </P>
+            <P> SVVDiffCoeff    = 0.1                    </P>
+            <P> SVVCutoffRatio  = 0.7                    </P>
+        </PARAMETERS>
+
+        <VARIABLES>
+            <V ID="0"> u </V>
+            <V ID="1"> v </V>
+            <V ID="2"> w </V>
+            <V ID="3"> p </V>
+        </VARIABLES>
+
+        <BOUNDARYREGIONS>
+            <B ID="0"> C[3] </B>  	<!-- bottom -->
+            <B ID="1"> C[1] </B>  	<!-- inflow -->
+            <B ID="2"> C[2] </B>  	<!-- outflow -->
+            <B ID="3"> C[4] </B>  	<!-- top -->
+        </BOUNDARYREGIONS>
+
+        <BOUNDARYCONDITIONS>
+            <!-- bottom -->
+            <REGION REF="0">
+                <P VAR="u"  VALUE="[3]" />
+                <P VAR="v"  VALUE="[3]" />
+                <P VAR="w"  VALUE="[3]" />
+                <P VAR="p"  VALUE="[3]" />
+            </REGION>
+            <!-- top -->
+            <REGION REF="3">
+                <P VAR="u"  VALUE="[0]" />
+                <P VAR="v"  VALUE="[0]" />
+                <P VAR="w"  VALUE="[0]" />
+                <P VAR="p"  VALUE="[0]" />
+            </REGION>
+            <!-- outflow -->
+            <REGION REF="1">
+                <N VAR="u" USERDEFINEDTYPE="HOutflow" VALUE="0" />
+                <N VAR="v" USERDEFINEDTYPE="HOutflow" VALUE="0" />
+                <N VAR="w" USERDEFINEDTYPE="HOutflow" VALUE="0" />
+                <D VAR="p" USERDEFINEDTYPE="HOutflow" VALUE="0" />
+            </REGION>
+            <!-- inflow -->
+            <REGION REF="2">
+                <D VAR="u" VALUE="uInf" />
+                <D VAR="v" VALUE="vInf" />
+                <D VAR="w" VALUE="wInf" />
+                <N VAR="p" USERDEFINEDTYPE="H" VALUE="0" />
+            </REGION>
+        </BOUNDARYCONDITIONS>
+
+        <FUNCTION NAME="InitialConditions">
+            <E VAR="u" VALUE="uInf" />
+            <E VAR="v" VALUE="vInf" />
+            <E VAR="w" VALUE="wInf" />
+            <E VAR="p" VALUE="0"    />
+        </FUNCTION>
+    </CONDITIONS>
+
+</NEKTAR>

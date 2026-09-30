@@ -1,0 +1,74 @@
+\newcommand{\nodeLabel}[3]{
+    \node[color=#3, fill=white] at (#1) {\fontsize{10}{10}\selectfont #2}
+}
+
+\newcommand{\drawEdge}[3]{%
+  \draw[->, color=red, thick] 
+    ($ (#1)!0.1!(#2) $)  -- ($ (#2)!0.1!(#1) $);
+  \nodeLabel{$(#1)!0.5!(#2)$}{#3}{red}
+}
+
+\newcommand{\drawQuadFace}[6]{
+    \coordinate (midMid) at ($  ($(#1) !0.5! (#2)$)  !0.5!  ($(#3) !0.5! (#4)$)  $);
+    \coordinate (l0) at ($ (#1) !#6! (midMid) $);
+    \coordinate (l1) at ($ (#2) !#6! (midMid) $);
+    \coordinate (l2) at ($ (#3) !#6! (midMid) $);
+    \coordinate (l3) at ($ (#4) !#6! (midMid) $);
+    \coordinate (l4) at ($ (l3) !0.33! (l0) $);
+    \node[color=blue] at (midMid) {\fontsize{10}{10}\selectfont #5};
+    \draw[->, color=blue, thick] (l0) -- (l1) -- (l2) -- (l3)-- (l4)
+}
+
+\newcommand{\drawTriFace}[5]{
+    \coordinate (midMid) at ($  ($(#1) !0.5! (#2)$)  !0.33!  (#3)  $);
+    \coordinate (l0) at ($ (#1) !#5! (midMid) $);
+    \coordinate (l1) at ($ (#2) !#5! (midMid) $);
+    \coordinate (l2) at ($ (#3) !#5! (midMid) $);
+    \coordinate (l3) at ($ (l2) !0.33! (l0) $);
+    \node[color=blue] at (midMid) {\fontsize{10}{10}\selectfont #4};
+    \draw[->, color=blue, thick] (l0) -- (l1) -- (l2) -- (l3)
+}
+
+
+\tdplotsetmaincoords{-26}{3}
+
+\begin{tikzpicture}[line join=bevel,tdplot_main_coords,scale=2.2,>=latex]
+  \coordinate (C) at ( 1.5,-1.5,-1.5);
+  \coordinate (F) at (-1.5,-1.5,-1.5);
+  \coordinate (E) at (-1.5, 1,-1.5);
+  \coordinate (B) at ( 1.5, 1,-1.5);
+  \coordinate (D) at (   0,-1.5, 1.5);
+  \coordinate (A) at (   0, 1, 1.5);
+
+  \draw (A) -- (B) -- (C) -- (D) -- cycle;
+  \draw (A) -- (E) -- (F) -- (D);
+  \draw (B) -- (E);
+  \draw[dashed,opacity=0.5] (C) -- (F);
+  % \draw (A) -- (B) -- (C) -- (E) -- cycle;
+  % \draw (B) -- (E);
+
+    \drawEdge{C}{F}{6};
+  
+  \drawQuadFace{A}{D}{C}{B}{0}{0.35};
+  \drawTriFace{E}{A}{B}{1}{0.3};
+  \drawQuadFace{E}{F}{C}{B}{2}{0.3};
+  \drawTriFace{F}{D}{C}{3}{0.3};
+  \drawQuadFace{E}{A}{D}{F}{4}{0.35};
+  
+  \drawEdge{A}{B}{0};
+  \drawEdge{D}{C}{2};
+  \drawEdge{A}{D}{3};
+  \drawEdge{B}{C}{1};
+  \drawEdge{A}{E}{4};
+  \drawEdge{B}{E}{5};
+  \drawEdge{D}{F}{7};
+  \drawEdge{E}{F}{8};
+
+  \nodeLabel{A}{0}{black};
+  \nodeLabel{B}{1}{black};
+  \nodeLabel{C}{2}{black};
+  \nodeLabel{D}{3}{black};
+  \nodeLabel{E}{4}{black};
+  \nodeLabel{F}{5}{black};
+
+\end{tikzpicture}

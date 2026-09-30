@@ -1,0 +1,6 @@
+Checks: "-*,\
+readability-braces-around-statements,\
+modernize-concat-nested-namespaces,\
+modernize-raw-string-literal,\
+modernize-use-nullptr,\
+modernize-use-override"

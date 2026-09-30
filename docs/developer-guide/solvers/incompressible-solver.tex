@@ -1,0 +1,232 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{IncNavierStokesSolver: Solving the Incompressible Navier-Stokes Equations}
+
+In this chapter, we walk the reader through our 2D, quasi-3D and 3D incompressible Navier-Stokes Solver (IncNavierStokesSolver).
+
+\section{Fundamental Theories of IncNavierStokesSolver}
+
+\subsection{Governing Equations}
+
+A useful tool implemented in Nektar++ is the incompressible Navier
+Stokes solver that allows one to solve the governing equation for
+viscous Newtonians fluids governed by
+
+\begin{subequations}
+\begin{align}
+    \frac{\partial \mathbf{u}}{\partial t} + \mathbf{u} \cdot \nabla \mathbf{u} &= -\nabla p + \nu \nabla^2 \mathbf{u} +  \mathbf{f}, \label{eq.navierstokes} \\
+    \nabla \cdot \mathbf{u} &= 0,
+\end{align}
+\end{subequations}
+
+where $\mathbf{u}$ is the velocity, $p$ is the specific pressure (including
+density) and $\nu$ the kinematic viscosity.
+
+
+\subsection{Time discretisation}
+\subsubsection{Velocity-correction scheme}
+An efficient approach to solve the incompressible navier-stokes equations  are splitting schemes.
+These schemes decouple the monolithic system of the original momentum and mass conversation into subsequent steps that separate solving into a Poisson problem and three velocity problems, assuming a three dimensional problem.
+One type of the splitting are the velocity-correction type schemes.
+They begin with an initial step that evaluates the advection term and subsequent steps to solve for the new pressure $p^{n+1}$ and velocity vector $\mathbf{u}^{n+1}$, where we use the formulation $u^{n} = u(t^{n} = n \Delta t)$ to denote the discrete time.
+
+Within Nektar\verb|++| we consider a rotational velocity-correction scheme \verb|VelocityCorrectionScheme| that enables higher-order time accuracy despite the splitting \cite{Karniadakis1991}.
+The first step evaluates the advection term $N(\mathbf{u})^{n} = [\mathbf{u} \cdot \nabla \mathbf{u}]^n$ explicitly.
+Subsequently, the algorithms solves a pressure Poisson problem of the form
+\begin{align}
+    \nabla p^{n+1} =
+    - \frac{1}{\Delta t} \left( \gamma \tilde{\mathbf{u}}^{n+1} - \sum_{q=0}^{J-1} \alpha_q \mathbf{u}^{n-q} \right)
+    - [\mathbf{u} \cdot \nabla \mathbf{u}]^{n} \nonumber \\
+    - \nu \nabla \times \nabla \times \mathbf{u}^{n}
+    + \mathbf{f}^{n+1}, \label{eq.vcsPoisson}
+\end{align}
+where $\alpha_q$ are the coefficients of the backwards difference formula summation that approximates the timer derivative.
+The equation is supplemented with appropriate pressure boundary conditions to enable higher-order time accuracy \cite{Karniadakis1991}.
+These boundary conditions are
+\begin{align}
+    \frac{\partial p}{\partial \mathbf{n}}^{n+1} =
+    \mathbf{n} \cdot \Bigg[ \frac{1}{\Delta t} \sum_{q=0}^{J-1} \alpha_q \mathbf{u}^{n-q}
+    - [\mathbf{u} \cdot \nabla \mathbf{u}]^{n} \nonumber \\
+    - \nu \nabla \times \nabla \times \mathbf{u}^{n}
+    + \mathbf{f}^{n+1} \Bigg]. \label{eq.vcsPoissonBcs}
+\end{align}
+They are implemented within the \verb|Extrapolation| class.
+The velocity equation uses the updated pressure $p^{n+1}$ and solves a Helmholtz problem for each velocity component with
+\begin{align}
+    \frac{\gamma}{\Delta t} \mathbf{u}^{n+1}
+    - \nu \nabla^2 \mathbf{u}^{n+1}
+    =&
+    \frac{1}{\Delta t} \sum_{q=0}^{J-1} \alpha_q \mathbf{u}^{n-q}
+    - \nabla p^{n+1} \nonumber \\
+    &- [\mathbf{u} \cdot \nabla \mathbf{u}]^{n}
+    + \mathbf{f}^{n+1}
+    . \label{eq.vcsHelmholtz}
+\end{align}
+The right hand side for this equation is computed within \verb|ViscousForcing| and the solution of the helmholtz problem happens within \verb|ViscousSolve| via a call to \verb|MultiRegions::HelmSolve|.
+
+We also consider two different approaches to be unconditionally stable in the choice of time stepsize $\Delta t$.
+The sub-stepping scheme \cite{Sherwin2003} is expressing the velocity-correction scheme in a semi-Lagrangian form.
+It expresses the material derivative in the Lagrangian frame of reference while the pressure and viscous terms are in the Eulerian frame as for the above scheme.
+Therefore, the scheme mainly changes the initial evaluation of the advection term, but does not change the subsequent pressure and velocity problems.
+
+Starting with the material derivative in the Lagrangian form
+%
+\begin{equation}
+     \frac{D \mathbf{u}}{Dt} = \frac{\partial \mathbf{u}}{\partial t} + \mathbf{u} \cdot \nabla \mathbf{u} =
+    -\nabla p + \nu \nabla^2 \mathbf{u}.
+\end{equation}
+
+Reference \cite{Karniadakis1991} proposes to discretise the unsteady term in time with a $J$th order BDF as
+%
+\begin{equation}
+     \frac{D \mathbf{u}}{Dt} = \frac{ \mathbf{u}^{n+1} -  \sum_{q=0}^{J-1} \alpha_q \mathbf{u}_d^{n-q}}{\Delta t}
+\end{equation}
+%
+where the $ \mathbf{u}_d^{n-q}$ corresponds to the velocity at the departure point $\mathbf{x_d}= (x_d, y_d, z_d)$ and at time instance $t^n$.
+
+To find the velocity field at the departure point, the unsteady advection equation is solved in an auxiliary pseudo-time $t^{n+1-q} < \tau < t^{n+1}$ where $q$ stands for the total number of iterations executed in pseudo-time $\tau$.
+
+\begin{equation}
+   \frac{ \partial \hat{\mathbf{u}} } { \partial \tau } + \mathbf{u} \cdot \nabla \hat{\mathbf{u}} = 0
+\end{equation}
+
+where $ \hat{\mathbf{u}} $ is a complementary velocity field.
+The field represents the influence of convection on the examined flow, $\mathbf{u}$ is the divergence-free advection velocity.
+Having computed this updated velocity field, we evaluate the advection term for equation (\ref{eq.vcsPoisson}) and (\ref{eq.vcsPoissonBcs}) to solve for the new pressure and velocity as in the semi-implicit form.
+
+The sub-stepping does only change the evaluation of the advection term $\mathbf{N}$ and is implemented inside the class \verb|SubsteppingExtrapolate|.
+
+
+The implicit velocity-correction schemes \verb|VCSImplicit| transforms the velocity equation to be unconditionally stable with respect to the CFL condition.
+The key difference to the semi-implicit scheme is a linearisation of the advection operator.
+The linearisation assumes that $\mathbf{u}^{n+1} \cdot \nabla \mathbf{u}^{n+1} \approx \mathbf{\tilde{u}} \cdot \nabla \mathbf{u}^{n+1}$ where the advection velocity $\tilde{\mathbf{u}}$ is approximated by either an \verb|extrapolation| of the form $\mathbf{\tilde{u}} \approx \sum_{q=0}^{J-1} \mathbf{u}^{n-q}$ \cite{Simo1994} or an \verb|updated velocity| that uses the new pressure $p^{n+1}$ \cite{Dong2010}.
+
+
+The velocity problem with linearisation becomes an advection-diffusion-reaction (ADR) problem.
+It is defined as
+\begin{align}
+    \frac{\gamma}{\Delta t} \mathbf{u}^{n+1}
+    - \nu \nabla^2 \mathbf{u}^{n+1}
+    + \tilde{\mathbf{u}} \cdot \nabla \mathbf{u}^{n+1}
+    =
+    \frac{1}{\Delta t} \sum_{q=0}^{J-1} \alpha_q \mathbf{u}^{n-q} \nonumber \\
+    - \nabla p^{n+1}
+    + \mathbf{f}^{n+1}
+    . \label{eq.vcsADR}
+\end{align}
+This scheme is a child of the semi-implicit scheme and implemented in the class \verb|VCSImplicit| with an appropriate extrapolation in \verb|ImplicitExtrapolate|.
+
+
+\subsection{Spatial discretisation/Implementation}
+We implement the various time discretisations above with a spectral hp element method.
+Therefore, we transform the strong form equations for pressure and velocity to 
+the weak form using the L2 inner product with basis functions $\phi$.
+For the pressure equation (\ref{eq.vcsPoisson}), we do the inner product with 
+the derivative of the basis $\nabla \phi$ which leads to the equation
+\begin{align}
+    \int_\Omega \nabla \phi \cdot \nabla p^{n+1} &= 
+    \int_\Omega \phi \nabla \cdot 
+    \left( -\frac{\hat{\mathbf{u}}}{\Delta t} + 
+    [\mathbf{u} \cdot \nabla \mathbf{u}]^{\star n+1} - 
+    \mathbf{f}^{n+1} \right) \nonumber\\
+    &- \int_{\Gamma} \left[ \phi \left( 
+    -\frac{\hat{\mathbf{u}}}{\Delta t} 
+    + [\mathbf{u} \cdot \nabla \mathbf{u}]^{\star n+1} 
+    + \nu \nabla \times \nabla \times \mathbf{u}^{\star n+1} 
+    - \mathbf{f}^{n+1} 
+    \right) \right] \cdot \mathbf{n}.
+    \label{eq.vcsPoissonWeak}
+\end{align}
+
+Then, taking the L2 inner product with the basis $\psi$ for the velocity equation
+in equation \ref{eq.vcsHelmholtz} leads to the weak form
+\begin{align}
+	\int_\Omega \nabla \psi \cdot \nabla \mathbf{u}^{n+1} 
+    + \frac{\gamma}{\nu \Delta t} \psi \mathbf{u}^{n+1} 
+    = - \frac{1}{\nu} \int_\Omega \psi \left( 
+    - \frac{\hat{\mathbf{u}}}{\Delta t} 
+    + \nabla p^{n+1} 
+    + [\mathbf{u} \cdot \nabla \mathbf{u}]^{\star n+1} 
+    - \mathbf{f}^{n+1} 
+    \right).
+    \label{eq.vcsHelmholtzWeak}
+\end{align}
+
+The final discrete data of the variables $u,v,w,p$ are saved within an array of
+\verb|ExpListSharedPtr| named \verb|m_fields|.
+Each \verb|ExpListSharePtr| in \verb|m_fields| holds a reference to a \verb|ContField| object
+that saves the data in coefficient \verb|Coeff| and physical \verb|Phys| space.
+For example, one can access the w-velocity data via \verb|m_fields[2]->GetPhys()|
+which return an Array of the data in physical space (i.e. at the quadrature points)
+for each element.
+Note that the pressure is always the hint-most entry in \verb|m_fields|.
+Also, it can separately be accessed via \verb|m_pressure| which is simply
+reference to the last entry in \verb|m_fields|.
+
+
+\section{Functions of the implementation}
+Table \ref{tab:IncNSFunctionName} presents the public functions that is responsible for performing the velocity-correction scheme (VCS).
+\begin{table}[htbp!]
+    \caption {Table of variable and function mapping used in the incompressible flow solver to their mathematical operations}
+    \label{tab:IncNSFunctionName} 
+    \begin{center}
+    %\scalebox{0.9}[1.]{
+        \begin{tabular}{ | l | l|}
+        \hline      
+        \textbf{ Variable/Function name} & \textbf{ Physical meaning} \\  
+        \hline
+        \verb| VelocityCorrectionScheme|  & Constructor using the Session and MeshGraph objects.\\
+        \hline
+        \verb| SetUpPressureForcing| & Compute RHS of pressure equation: $\int_\Omega$ in \ref{eq.vcsPoissonWeak} \\
+        \hline
+        \verb| SetUpViscousForcing| &  Compute RHS of Helmholtz equations, see \ref{eq.vcsHelmholtzWeak} \\ 
+        \hline
+        \verb| SolvePressure| & Solves the pressure Poisson system $\nabla^2 p^{n+1} = f$ \\
+        \hline
+        \verb| SolveViscous| & Solves the Helmholtz equations $[\nabla^2 - \lambda] \mathbf{u}^{n+1} = \mathbf{f}$\\
+        \hline
+        \verb| SolveUnsteadyStokesSystem| & Implicit part - Solve Poisson + $d$ * Helmholtz\\
+        \hline
+        \verb| EvaluateAdvection_SetPressureBCs| & Explicit part - Advection + Forcing: $[\mathbf{u} \cdot \nabla \mathbf{u}]^{\star n+1} - \mathbf{f}^{n+1}$ \\
+         & Also sets the pressure BCs: $\int_\Gamma$ in \ref{eq.vcsPoissonWeak} \\
+        \hline
+        \end{tabular}
+    %}
+    \end{center}
+\end{table}
+
+
+
+
+
+\section{Structure of the algorithm}
+
+
+\begin{enumerate}
+    \item The entry point is the main() function in solvers/IncNavierStokesSolver/IncNavierStokesSolver.cpp
+    \item Session initialization (possibly reading)
+    \item Mesh graph creation, weights, polynomials, partition for parallel
+    \item Driver initialization, many Drivers are possible, e.g. Standard
+    \item Driver execution
+    \item Finalization specific tasks
+\end{enumerate}
+
+The magic happens at the level of the Driver.
+This is where all the important stuff is selected.
+One of the possible rivers is selected:
+\begin{figure}
+\centering
+\includestandalone[width=0.5\textwidth]{DriverChart}
+\end{figure}
+
+During the initialization of the Driver object components of the solution process are created and initialized.
+The most common ones are:
+\begin{itemize}
+    \item EvolutionOperator responsible for the type of probelm. Possible values are:
+    Nonlinear (default), Direct (linear), Adjoint, TransientGrowtsh, SkewSymmetric
+    \item EquationType that determines the problem to be solved e.g. UnsteadyNavierStokes
+    \item SolverType, i.e. the scheme to be used such as the VelocityCorrection
+    \item The ProjectionType (CG or DG, Homogenous ...)
+    is initialized during initialization of the EquationSystem object.
+    At this moment velocity and pressure variable fields are created.
+    \item Need to add the information on where the time integration scheme is initialized.
+\end{itemize}

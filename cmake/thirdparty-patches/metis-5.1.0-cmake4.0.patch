@@ -1,0 +1,8 @@
+--- metis-5.1.0/CMakeLists.txt	2026-06-04 09:44:40.298278953 +0100
++++ metis-5.1.0/CMakeLists.txt	2026-06-04 09:44:40.298278953 +0100
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 2.8)
++cmake_minimum_required(VERSION 3.5)
+ project(METIS)
+ 
+ set(GKLIB_PATH "GKlib" CACHE PATH "path to GKlib")

@@ -1,0 +1,26 @@
+ # Define helper macro option_with_default
+ macro( option_with_default OPTION_NAME OPTION_STRING OPTION_DEFAULT )
+--- oce-0.18.3-ori/src/Font/Font_BRepFont.cxx	2026-04-29 22:37:04.270826330 +0100
++++ oce-0.18.3/src/Font/Font_BRepFont.cxx	2026-04-29 22:43:58.141404397 +0100
+@@ -255,7 +255,7 @@
+   for (short aContour = 0, aStartIndex = 0; aContour < anOutline.n_contours; ++aContour)
+   {
+     const FT_Vector* aPntList = &anOutline.points[aStartIndex];
+-    const char* aTags      = &anOutline.tags[aStartIndex];
++    const char* aTags      = (const char *)&anOutline.tags[aStartIndex];
+     const short anEndIndex = anOutline.contours[aContour];
+     const short aPntsNb    = (anEndIndex - aStartIndex) + 1;
+     aStartIndex = anEndIndex + 1;
+--- oce-0.18.3-ori/src/OSD/OSD.cxx 2026-04-30 23:25:12.369151568 +0100
++++ oce-0.18.3/src/OSD/OSD.cxx     2026-04-30 23:25:29.837430123 +0100
+@@ -18,8 +18,8 @@
+ #include <math.h>
+ #ifdef WNT
+ # define finite _finite
+-#elif defined(isfinite)
+-# define finite isfinite
++#else
++# define finite isfinite
+ #endif
+
+ // Convert Real to CString in format e with 16 significant digits.

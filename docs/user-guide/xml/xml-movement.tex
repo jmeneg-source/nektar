@@ -1,0 +1,155 @@
+\section{Movement}
+This section defines the movement of the mesh. Currently only static
+non-conformal interfaces are supported.
+
+\subsection{Non-conformal meshes}\label{subsec:non-conformal-meshes}
+Non-conformal meshes are defined using \inltt{ZONES} and \inltt{INTERFACES}.
+Each zone is a domain as defined in the \inltt{GEOMETRY} section. For a mesh to
+be non-conformal it must consist of at least two zones with different domain
+tags. These two zones can then be split by an interface where every interface is
+defined by two composite entities, we use \inltt{LEFT} and \inltt{RIGHT}
+notation to distinguish between these. Each zone must contain either the left or
+the right interface edge. Zones can contain multiple edges across different
+interfaces but must not contain both edges for the same interface. These left
+and right interface edges have to be geometrically identical but topologically
+disconnected i.e.\ occupy the same space physically but consist of independent
+geometry objects.
+
+Non-conformal interfaces are defined enclosed in the \inltt{NEKTAR} tag. An
+example showing two non-conformal interfaces on a single mesh is below:
+
+\begin{lstlisting}[style=XMLStyle]
+<MOVEMENT>
+    <ZONES>
+        <FIXED ID="0" DOMAIN="D[0]" />
+        <FIXED ID="1" DOMAIN="D[1]" />
+        <FIXED ID="2" DOMAIN="D[2]" />
+    </ZONES>
+    <INTERFACES>
+        <INTERFACE NAME="First">
+            <LEFT  ID="0" BOUNDARY="C[0]" />
+            <RIGHT ID="1" BOUNDARY="C[1]"  />
+        </INTERFACE>
+        <INTERFACE NAME="Second">
+            <LEFT  ID="1" BOUNDARY="C[2]" />
+            <RIGHT ID="2" BOUNDARY="C[3]"  />
+        </INTERFACE>
+    </INTERFACES>
+</MOVEMENT>
+\end{lstlisting}
+
+Zones must have a type specified, at the moment only `FIXED' interfaces are
+supported however in the future there are plans to implement rotating and 
+sliding motion using the ALE method. It is important for the zone IDs to
+correspond with the relevant interface IDs present on the zone, that is if there
+is an interface with ID 0 there must also be a zone with ID 0 too. Zone IDs must
+be unique but interfaces can have the same ID, e.g. in the example above zone ID
+1 has two interfaces attached to it. The inclusion of an
+\inltt{"INTERFACE NAME="..."} allows for specifying a name, which is used for
+the debug output when the verbose flag `-v' is specified. This is for user
+reference to ensure the non-conformal interfaces are set up correctly, and shows
+zone/interface IDs, number of elements in each zone and interface, and
+connections between each zone/interface. An example debug output for the above
+XML is shown below:
+
+\begin{lstlisting}
+Movement Info:
+	Num zones: 3
+	- 0 Fixed: 8  Quadrilaterals
+	- 1 Fixed: 24 Quadrilaterals
+	- 2 Fixed: 4  Quadrilaterals
+	Num interfaces: 2
+	- "First":  0 (4 Segments) <-> 1 (6 Segments)
+	- "Second": 1 (6 Segments) <-> 2 (2 Segments)
+\end{lstlisting}
+
+
+\subsection{Sliding Mesh}\label{subsec:Sliding Mesh}
+ALE method is implemented through \inltt{MOVEMENT} and \inltt{ALEHELPER} for sliding 
+mesh with rotating and sliding motion. Zones type can be specified by `ROTATE' and 
+'TRANSLATE' interface. Recently, the ALE method is implemented in \inltt{ADRSolver} 
+and \inltt{CompressibleFlowSolver}.
+
+An example for the rotationg movement is shown below:
+
+\begin{lstlisting}[style=XMLStyle]
+<MOVEMENT>
+<ZONES>
+    <FIXED ID="0" DOMAIN="D[0]" />
+    <ROTATE ID="1" DOMAIN="D[1]" ORIGIN="0,0.5,0" AXIS="0,0,1" ANGVEL="100"/>
+</ZONES>
+<INTERFACES>
+    <INTERFACE NAME="Circle">
+        <LEFT  ID="0" BOUNDARY="C[405]" />
+        <RIGHT ID="1" BOUNDARY="C[406]"  />
+    </INTERFACE>
+</INTERFACES>
+</MOVEMENT>
+\end{lstlisting}
+
+Here \inltt{ORIGIN} and \inltt{AXIS} are the origin and axis that the zone rotates about, 
+respectively. \inltt{ANGVEL} is the the angular velocity of rotation with radians unit. 
+
+The sector rotation can be defined using the following configuration:
+\begin{lstlisting}[style=XMLStyle]
+<MOVEMENT>
+<ZONES>
+    <ROTATE ID="0" DOMAIN="D[0]" ORIGIN="0,0,0" AXIS="0,0,1" ANGVEL="1" SECTOR="PI/15" BASE="0,1.1,0"/>
+    <ROTATE ID="1" DOMAIN="D[1]" ORIGIN="0,0,0" AXIS="0,0,1" ANGVEL="0"  SECTOR="PI/15" BASE="0,1.1,0"/>
+</ZONES>
+<INTERFACES>
+    <INTERFACE NAME="Sector">
+        <RIGHT ID="0" BOUNDARY="C[501]"  />
+        <LEFT  ID="1" BOUNDARY="C[502]" />
+    </INTERFACE>
+    </INTERFACES>
+</MOVEMENT>
+\end{lstlisting}
+
+Compared to full rotation, sector rotation applies rotational motion to only a specific portion of the mesh, 
+making it especially useful for simulating periodic slices of rotationally symmetric domains, thereby reducing computational cost.
+Here, \inltt{SECTOR} specifies the angular span of the rotating sector, in radians. For example, PI/15 defines a 12° slice. 
+\inltt{BASE} defines the reference line where the sector starts its rotation. 
+\inltt{AXIS} is the axis about which the rotation occurs (commonly the z-axis: (0,0,1)).
+\inltt{ANGVEL} sets the angular velocity (e.g., 1 for the rotating domain, 0 for stationary).
+
+Figure~\ref{fig:xml:move:sector_rotation} shows a schematic of sector rotation, with the base line indicated.
+\begin{figure}[h]
+    \begin{center}
+        \includegraphics[width=0.4\textwidth]{img/Sector_rotate.png}
+    \end{center}
+    \caption{Illustration of sector rotation and base line}\label{fig:xml:move:sector_rotation}
+\end{figure}
+
+To correctly apply rotational periodic boundary conditions along the sides of the sector, please refer to Section~\ref{sec:periodicBC}. 
+In addition, the mesh must be pre-aligned to ensure proper periodic matching, as detailed in Section~\ref{s:utilities:nekmesh:sub:peralign}.
+Note that, current sector rotation is supported only with the Interior Penalty method for the diffusion term.
+Additionally, the rotation axis must coincide with one of the global Cartesian axes—x, y, or z. 
+Rotation about an arbitrary axis is not yet supported.
+
+Another example for the translating movement is shown below:
+
+\begin{lstlisting}[style=XMLStyle]
+<MOVEMENT>
+<ZONES>
+    <FIXED ID="0" DOMAIN="D[0]" />
+    <TRANSLATE ID="1" DOMAIN="D[1]" VELOCITY="0,PI*cos(2*PI*t)" DISPLACEMENT="0,0.5*sin(2*PI*t)"/>
+    <FIXED ID="2" DOMAIN="D[2]" />
+</ZONES>
+<INTERFACES>
+    <INTERFACE NAME="Left interface">
+        <LEFT  ID="0" BOUNDARY="C[405]" SKIPCHECK="TRUE"/>
+        <RIGHT ID="1" BOUNDARY="C[406]" SKIPCHECK="TRUE"/>
+    </INTERFACE>
+    <INTERFACE NAME="Right interface">
+        <LEFT  ID="1" BOUNDARY="C[407]" SKIPCHECK="TRUE"/>
+        <RIGHT ID="2" BOUNDARY="C[408]" SKIPCHECK="TRUE"/>
+    </INTERFACE>
+</INTERFACES>
+</MOVEMENT>
+\end{lstlisting}
+
+Here \inltt{VELOCITY} and \inltt{DISPLACEMENT} are the translation velocity and 
+displacement in x,y,z direction. \inltt{SKIPCHECK} is defined to ignore the missing 
+coordinates found check for specific interface.
+

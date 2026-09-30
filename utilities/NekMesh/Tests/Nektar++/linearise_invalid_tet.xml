@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<NEKTAR>
+    <GEOMETRY DIM="3" SPACE="3">
+        <VERTEX>
+            <V ID="0">1.75238508e-01 4.16403452e-01 8.41250000e-01</V>
+            <V ID="1">1.74820494e-01 4.09579479e-01 8.52841532e-01</V>
+            <V ID="2">1.71134097e-01 4.25638769e-01 8.49647106e-01</V>
+            <V ID="3">1.66524286e-01 4.16990279e-01 8.57362692e-01</V>
+            <V ID="4">1.64704869e-01 4.06924661e-01 8.50904320e-01</V>
+            <V ID="5">1.63833445e-01 4.16965519e-01 8.41716673e-01</V>
+        </VERTEX>
+        <EDGE>
+            <E ID="0">0 1</E>
+            <E ID="1">1 2</E>
+            <E ID="2">0 2</E>
+            <E ID="3">0 3</E>
+            <E ID="4">1 3</E>
+            <E ID="5">2 3</E>
+            <E ID="6">0 4</E>
+            <E ID="7">1 4</E>
+            <E ID="8">1 5</E>
+            <E ID="9">0 5</E>
+            <E ID="10">4 5</E>
+            <E ID="11">3 5</E>
+        </EDGE>
+        <FACE>
+            <T ID="0">0 1 2</T>
+            <T ID="1">0 4 3</T>
+            <T ID="2">1 5 4</T>
+            <T ID="3">2 5 3</T>
+            <T ID="4">0 6 7</T>
+            <T ID="5">0 9 8</T>
+            <T ID="6">6 10 9</T>
+            <T ID="7">7 10 8</T>
+            <T ID="8">4 11 8</T>
+            <T ID="9">3 11 9</T>
+        </FACE>
+        <ELEMENT>
+            <A ID="0">0 1 2 3 </A>
+            <A ID="1">4 5 6 7 </A>
+            <A ID="2">1 5 8 9 </A>
+        </ELEMENT>
+        <CURVED>
+            <E ID="0" EDGEID="0" NUMPOINTS="6" TYPE="GaussLobattoLegendre">1.75238508e-01 4.16403452e-01 8.41250000e-01   1.75329106e-01 4.16417946e-01 8.42852182e-01   1.75392226e-01 4.15736440e-01 8.46112950e-01   1.75259032e-01 4.13710795e-01 8.49635449e-01   1.74992490e-01 4.11101835e-01 8.51979476e-01   1.74820494e-01 4.09579479e-01 8.52841532e-01   </E>
+        </CURVED>
+        <COMPOSITE>
+            <C ID="100"> A[0-2] </C>
+        </COMPOSITE>
+        <DOMAIN>
+            <D ID="0"> C[100] </D>
+        </DOMAIN>
+    </GEOMETRY>
+    <Metadata>
+        <Provenance>
+            <GitBranch>refs/heads/fix/MeshElementTet_edge_id</GitBranch>
+            <GitSHA1>ff0f6b727c67e44342fb21b1acbd33996ef5158e</GitSHA1>
+            <Hostname>MBP.lan</Hostname>
+            <NektarVersion>5.3.0</NektarVersion>
+            <Timestamp>11-Sep-2023 13:01:02</Timestamp>
+        </Provenance>
+        <NekMeshCommandLine>-v jacs.xml invalid.xml:xml:uncompress </NekMeshCommandLine>
+    </Metadata>
+    <EXPANSIONS>
+        <E COMPOSITE="C[100]" NUMMODES="4" TYPE="MODIFIED" FIELDS="u" />
+    </EXPANSIONS>
+</NEKTAR>

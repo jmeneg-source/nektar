@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<NEKTAR>
+    <GEOMETRY DIM="2" SPACE="2">
+        <VERTEX>
+            <V ID="0">-1.00000000e+00 -1.00000000e+00 0.00000000e+00</V>
+            <V ID="1">0.00000000e+00 -1.00000000e+00 0.00000000e+00</V>
+            <V ID="2">0.00000000e+00 0.00000000e+00 0.00000000e+00</V>
+            <V ID="3">-1.00000000e+00 0.00000000e+00 0.00000000e+00</V>
+            <V ID="4">0.00000000e+00 1.00000000e+00 0.00000000e+00</V>
+            <V ID="5">-1.00000000e+00 1.00000000e+00 0.00000000e+00</V>
+            <V ID="6">1.00000000e+00 -1.00000000e+00 0.00000000e+00</V>
+            <V ID="7">1.00000000e+00 0.00000000e+00 0.00000000e+00</V>
+            <V ID="8">1.00000000e+00 1.00000000e+00 0.00000000e+00</V>
+        </VERTEX>
+        <EDGE>
+            <E ID="0">0 1</E>
+            <E ID="1">1 2</E>
+            <E ID="2">2 3</E>
+            <E ID="3">3 0</E>
+            <E ID="4">2 4</E>
+            <E ID="5">4 5</E>
+            <E ID="6">5 3</E>
+            <E ID="7">1 6</E>
+            <E ID="8">6 7</E>
+            <E ID="9">7 2</E>
+            <E ID="10">7 8</E>
+            <E ID="11">8 4</E>
+        </EDGE>
+        <ELEMENT>
+            <Q ID="0">0 1 2 3</Q>
+            <Q ID="1">2 4 5 6</Q>
+            <Q ID="2">7 8 9 1</Q>
+            <Q ID="3">9 10 11 4</Q>
+        </ELEMENT>
+        <CURVED />
+        <COMPOSITE>
+            <C ID="0"> Q[0-3] </C>
+            <C ID="1"> E[0,7] </C>
+            <C ID="2"> E[8,10] </C>
+            <C ID="3"> E[5,11] </C>
+            <C ID="4"> E[3,6] </C>
+        </COMPOSITE>
+        <DOMAIN>
+            <D ID="0"> C[0] </D>
+        </DOMAIN>
+    </GEOMETRY>
+
+    <EXPANSIONS>
+        <E COMPOSITE="C[0]" FIELDS="u" TYPE="GLL_LAGRANGE_SEM" NUMMODES="16"/>
+    </EXPANSIONS>
+
+    <CONDITIONS>
+        <SOLVERINFO>
+            <I PROPERTY="EQTYPE"                VALUE="UnsteadyAdvection"           />
+            <I PROPERTY="Projection"            VALUE="DisContinuous"               />
+            <I PROPERTY="AdvectionAdvancement"  VALUE="Explicit"                    />
+            <I PROPERTY="AdvectionType"         VALUE="WeakDG"                      />
+            <I PROPERTY="UpwindType"            VALUE="Upwind"                      />
+        </SOLVERINFO>
+
+        <PARAMETERS>
+            <P> TimeStep        = 0.5e-03           </P>
+            <P> NumSteps        = 200               </P>
+            <P> IO_InfoSteps    = 0                 </P>
+            <P> wavefreq        = PI                </P>
+            <P> ax              = 20.0              </P>
+            <P> ay              = 20.0              </P>
+        </PARAMETERS>
+
+        <TIMEINTEGRATIONSCHEME>
+            <METHOD> ExplicitSDC </METHOD>
+            <VARIANT> GaussGaussLegendre </VARIANT>
+            <ORDER> 10 </ORDER>
+            <FREEPARAMETERS> 1.0 5 </FREEPARAMETERS>
+        </TIMEINTEGRATIONSCHEME>
+
+        <VARIABLES>
+            <V ID="0"> u </V>
+        </VARIABLES>
+
+        <BOUNDARYREGIONS>
+            <B ID="0"> C[1] </B>
+            <B ID="1"> C[2] </B>
+            <B ID="2"> C[3] </B>
+            <B ID="3"> C[4] </B>
+        </BOUNDARYREGIONS>
+
+        <BOUNDARYCONDITIONS>
+            <REGION REF="0">
+                <P VAR="u" VALUE="[2]" />
+            </REGION>
+            <REGION REF="1">
+                <P VAR="u" VALUE="[3]" />
+            </REGION>
+            <REGION REF="2">
+                <P VAR="u" VALUE="[0]" />
+            </REGION>
+            <REGION REF="3">
+                <P VAR="u" VALUE="[1]" />
+            </REGION>
+        </BOUNDARYCONDITIONS>
+
+        <FUNCTION NAME="AdvectionVelocity">
+            <E VAR="Vx" VALUE="ax" />
+            <E VAR="Vy" VALUE="ay" />
+        </FUNCTION>
+
+        <FUNCTION NAME="InitialConditions">
+            <E VAR="u" VALUE="sin(wavefreq*x)*sin(wavefreq*y)" />
+        </FUNCTION>
+
+        <FUNCTION NAME="ExactSolution">
+            <E VAR="u" VALUE="sin(wavefreq*(x-ax*t))*sin(wavefreq*(y-ay*t))" />
+        </FUNCTION>
+    </CONDITIONS>
+</NEKTAR>

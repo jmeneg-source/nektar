@@ -1,0 +1,893 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+//  File: HexGeom.cpp
+//
+//  For more information, please see: http://www.nektar.info/
+//
+//  The MIT License
+//
+//  Copyright (c) 2006 Division of Applied Mathematics, Brown University (USA),
+//  Department of Aeronautics, Imperial College London (UK), and Scientific
+//  Computing and Imaging Institute, University of Utah (USA).
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a
+//  copy of this software and associated documentation files (the "Software"),
+//  to deal in the Software without restriction, including without limitation
+//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//  and/or sell copies of the Software, and to permit persons to whom the
+//  Software is furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included
+//  in all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+//  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//  DEALINGS IN THE SOFTWARE.
+//
+//  Description: Hexahedral geometry definition.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+#include <SpatialDomains/GeomFactors.h>
+#include <SpatialDomains/Geometry1D.h>
+#include <SpatialDomains/HexGeom.h>
+#include <SpatialDomains/QuadGeom.h>
+#include <SpatialDomains/SegGeom.h>
+#include <SpatialDomains/XmapFactory.hpp>
+#include <StdRegions/StdHexExp.h>
+
+namespace Nektar::SpatialDomains
+{
+
+XmapFactory<StdRegions::StdHexExp, 3> &GetStdHexFactory()
+{
+    static XmapFactory<StdRegions::StdHexExp, 3> factory;
+    return factory;
+}
+
+const unsigned int HexGeom::VertexEdgeConnectivity[8][3] = {
+    {0, 3, 4},  {0, 1, 5}, {1, 2, 6},  {2, 3, 7},
+    {4, 8, 11}, {5, 8, 9}, {6, 9, 10}, {7, 10, 11}};
+const unsigned int HexGeom::VertexFaceConnectivity[8][3] = {
+    {0, 1, 4}, {0, 1, 2}, {0, 2, 3}, {0, 3, 4},
+    {1, 4, 5}, {1, 2, 5}, {2, 3, 5}, {3, 4, 5}};
+const unsigned int HexGeom::EdgeFaceConnectivity[12][2] = {
+    {0, 1}, {0, 2}, {0, 3}, {0, 4}, {1, 4}, {1, 2},
+    {2, 3}, {3, 4}, {1, 5}, {2, 5}, {3, 5}, {4, 5}};
+const unsigned int HexGeom::EdgeNormalToFaceVert[6][4] = {
+    {4, 5, 6, 7},  {1, 3, 9, 11}, {0, 2, 8, 10},
+    {1, 3, 9, 11}, {0, 2, 8, 10}, {4, 5, 6, 7}};
+
+HexGeom::HexGeom()
+{
+    m_shapeType = LibUtilities::eHexahedron;
+}
+
+HexGeom::HexGeom(int id, std::array<QuadGeom *, kNfaces> faces)
+    : Geometry3D(faces[0]->GetEdge(0)->GetVertex(0)->GetCoordim())
+{
+    m_shapeType = LibUtilities::eHexahedron;
+    m_globalID  = id;
+    m_faces     = faces;
+
+    SetUpLocalEdges();
+    SetUpLocalVertices();
+    SetUpEdgeOrientation();
+    SetUpFaceOrientation();
+}
+
+GeomType HexGeom::v_CalcGeomType()
+{
+    if (!m_setupState)
+    {
+        v_Setup();
+    }
+    v_FillGeom();
+
+    GeomType Gtype = eRegular;
+
+    // check to see if expansions are linear
+    if (m_xmap->GetBasisNumModes(0) != 2 || m_xmap->GetBasisNumModes(1) != 2 ||
+        m_xmap->GetBasisNumModes(2) != 2)
+    {
+        Gtype = eDeformed;
+    }
+
+    // check to see if all faces are parallelograms
+    if (Gtype == eRegular)
+    {
+        m_isoParameter = Array<OneD, Array<OneD, NekDouble>>(3);
+        for (int i = 0; i < 3; ++i)
+        {
+            m_isoParameter[i]    = Array<OneD, NekDouble>(8, 0.);
+            NekDouble A          = (*m_verts[0])(i);
+            NekDouble B          = (*m_verts[1])(i);
+            NekDouble C          = (*m_verts[2])(i);
+            NekDouble D          = (*m_verts[3])(i);
+            NekDouble E          = (*m_verts[4])(i);
+            NekDouble F          = (*m_verts[5])(i);
+            NekDouble G          = (*m_verts[6])(i);
+            NekDouble H          = (*m_verts[7])(i);
+            m_isoParameter[i][0] = 0.125 * (A + B + C + D + E + F + G + H); // 1
+
+            m_isoParameter[i][1] =
+                0.125 * (-A + B + C - D - E + F + G - H); // xi1
+            m_isoParameter[i][2] =
+                0.125 * (-A - B + C + D - E - F + G + H); // xi2
+            m_isoParameter[i][3] =
+                0.125 * (-A - B - C - D + E + F + G + H); // xi3
+
+            m_isoParameter[i][4] =
+                0.125 * (A - B + C - D + E - F + G - H); // xi1*xi2
+            m_isoParameter[i][5] =
+                0.125 * (A + B - C - D - E - F + G + H); // xi2*xi3
+            m_isoParameter[i][6] =
+                0.125 * (A - B - C + D - E + F + G - H); // xi1*xi3
+
+            m_isoParameter[i][7] =
+                0.125 * (-A + B - C + D + E - F + G - H); // xi1*xi2*xi3
+            NekDouble tmp = fabs(m_isoParameter[i][1]) +
+                            fabs(m_isoParameter[i][2]) +
+                            fabs(m_isoParameter[i][3]);
+            tmp *= NekConstants::kNekZeroTol;
+            for (int d = 4; d < 8; ++d)
+            {
+                if (fabs(m_isoParameter[i][d]) > tmp)
+                {
+                    Gtype = eDeformed;
+                }
+            }
+        }
+    }
+
+    if (Gtype == eRegular)
+    {
+        v_CalculateInverseIsoParam();
+    }
+
+    return Gtype;
+}
+
+GeomFactorsUniquePtr HexGeom::v_GenGeomFactors(
+    LibUtilities::PointsKeyVector &keyTgt)
+{
+    GeomType Gtype = CalcGeomType();
+
+    return ObjPoolManager<GeomFactors>::AllocateUniquePtr(
+        Gtype, m_coordim, m_xmap, m_coeffs, keyTgt);
+}
+
+int HexGeom::v_GetVertexEdgeMap(const int i, const int j) const
+{
+    return VertexEdgeConnectivity[i][j];
+}
+
+int HexGeom::v_GetVertexFaceMap(const int i, const int j) const
+{
+    return VertexFaceConnectivity[i][j];
+}
+
+int HexGeom::v_GetEdgeFaceMap(const int i, const int j) const
+{
+    return EdgeFaceConnectivity[i][j];
+}
+
+int HexGeom::v_GetEdgeNormalToFaceVert(const int i, const int j) const
+{
+    return EdgeNormalToFaceVert[i][j];
+}
+
+int HexGeom::v_GetDir(const int faceidx, const int facedir) const
+{
+    if (faceidx == 0 || faceidx == 5)
+    {
+        return facedir;
+    }
+    else if (faceidx == 1 || faceidx == 3)
+    {
+        return 2 * facedir;
+    }
+    else
+    {
+        return 1 + facedir;
+    }
+}
+
+void HexGeom::SetUpLocalEdges()
+{
+    // find edge 0
+    int i, j;
+    unsigned int check;
+
+    // First set up the 4 bottom edges
+    int f;
+    for (f = 1; f < 5; f++)
+    {
+        check = 0;
+        for (i = 0; i < 4; i++)
+        {
+            for (j = 0; j < 4; j++)
+            {
+                if ((m_faces[0])->GetEid(i) == (m_faces[f])->GetEid(j))
+                {
+                    m_edges[f - 1] =
+                        static_cast<SegGeom *>((m_faces[0])->GetEdge(i));
+                    check++;
+                }
+            }
+        }
+
+        if (check < 1)
+        {
+            std::ostringstream errstrm;
+            errstrm << "Connected faces do not share an edge. Faces ";
+            errstrm << (m_faces[0])->GetGlobalID() << ", "
+                    << (m_faces[f])->GetGlobalID();
+            NEKERROR(ErrorUtil::efatal, errstrm.str());
+        }
+        else if (check > 1)
+        {
+            std::ostringstream errstrm;
+            errstrm << "Connected faces share more than one edge. Faces ";
+            errstrm << (m_faces[0])->GetGlobalID() << ", "
+                    << (m_faces[f])->GetGlobalID();
+            NEKERROR(ErrorUtil::efatal, errstrm.str());
+        }
+    }
+
+    // Then, set up the 4 vertical edges
+    check = 0;
+    for (i = 0; i < 4; i++)
+    {
+        for (j = 0; j < 4; j++)
+        {
+            if ((m_faces[1])->GetEid(i) == (m_faces[4])->GetEid(j))
+            {
+                m_edges[4] = static_cast<SegGeom *>((m_faces[1])->GetEdge(i));
+                check++;
+            }
+        }
+    }
+    if (check < 1)
+    {
+        std::ostringstream errstrm;
+        errstrm << "Connected faces do not share an edge. Faces ";
+        errstrm << (m_faces[1])->GetGlobalID() << ", "
+                << (m_faces[4])->GetGlobalID();
+        NEKERROR(ErrorUtil::efatal, errstrm.str());
+    }
+    else if (check > 1)
+    {
+        std::ostringstream errstrm;
+        errstrm << "Connected faces share more than one edge. Faces ";
+        errstrm << (m_faces[1])->GetGlobalID() << ", "
+                << (m_faces[4])->GetGlobalID();
+        NEKERROR(ErrorUtil::efatal, errstrm.str());
+    }
+    for (f = 1; f < 4; f++)
+    {
+        check = 0;
+        for (i = 0; i < 4; i++)
+        {
+            for (j = 0; j < 4; j++)
+            {
+                if ((m_faces[f])->GetEid(i) == (m_faces[f + 1])->GetEid(j))
+                {
+                    m_edges[f + 4] =
+                        static_cast<SegGeom *>((m_faces[f])->GetEdge(i));
+                    check++;
+                }
+            }
+        }
+
+        if (check < 1)
+        {
+            std::ostringstream errstrm;
+            errstrm << "Connected faces do not share an edge. Faces ";
+            errstrm << (m_faces[f])->GetGlobalID() << ", "
+                    << (m_faces[f + 1])->GetGlobalID();
+            NEKERROR(ErrorUtil::efatal, errstrm.str());
+        }
+        else if (check > 1)
+        {
+            std::ostringstream errstrm;
+            errstrm << "Connected faces share more than one edge. Faces ";
+            errstrm << (m_faces[f])->GetGlobalID() << ", "
+                    << (m_faces[f + 1])->GetGlobalID();
+            NEKERROR(ErrorUtil::efatal, errstrm.str());
+        }
+    }
+
+    // Finally, set up the 4 top vertices
+    for (f = 1; f < 5; f++)
+    {
+        check = 0;
+        for (i = 0; i < 4; i++)
+        {
+            for (j = 0; j < 4; j++)
+            {
+                if ((m_faces[5])->GetEid(i) == (m_faces[f])->GetEid(j))
+                {
+                    m_edges[f + 7] =
+                        static_cast<SegGeom *>((m_faces[5])->GetEdge(i));
+                    check++;
+                }
+            }
+        }
+
+        if (check < 1)
+        {
+            std::ostringstream errstrm;
+            errstrm << "Connected faces do not share an edge. Faces ";
+            errstrm << (m_faces[5])->GetGlobalID() << ", "
+                    << (m_faces[f])->GetGlobalID();
+            NEKERROR(ErrorUtil::efatal, errstrm.str());
+        }
+        else if (check > 1)
+        {
+            std::ostringstream errstrm;
+            errstrm << "Connected faces share more than one edge. Faces ";
+            errstrm << (m_faces[5])->GetGlobalID() << ", "
+                    << (m_faces[f])->GetGlobalID();
+            NEKERROR(ErrorUtil::efatal, errstrm.str());
+        }
+    }
+}
+
+void HexGeom::SetUpLocalVertices()
+{
+    // Set up the first 2 vertices (i.e. vertex 0,1)
+    if ((m_edges[0]->GetVid(0) == m_edges[1]->GetVid(0)) ||
+        (m_edges[0]->GetVid(0) == m_edges[1]->GetVid(1)))
+    {
+        m_verts[0] = m_edges[0]->GetVertex(1);
+        m_verts[1] = m_edges[0]->GetVertex(0);
+    }
+    else if ((m_edges[0]->GetVid(1) == m_edges[1]->GetVid(0)) ||
+             (m_edges[0]->GetVid(1) == m_edges[1]->GetVid(1)))
+    {
+        m_verts[0] = m_edges[0]->GetVertex(0);
+        m_verts[1] = m_edges[0]->GetVertex(1);
+    }
+    else
+    {
+        std::ostringstream errstrm;
+        errstrm << "Connected edges do not share a vertex. Edges ";
+        errstrm << m_edges[0]->GetGlobalID() << ", "
+                << m_edges[1]->GetGlobalID();
+        NEKERROR(ErrorUtil::efatal, errstrm.str());
+    }
+
+    // set up the other bottom vertices (i.e. vertex 2,3)
+    int i;
+    for (i = 1; i < 3; i++)
+    {
+        if (m_edges[i]->GetVid(0) == m_verts[i]->GetGlobalID())
+        {
+            m_verts[i + 1] = m_edges[i]->GetVertex(1);
+        }
+        else if (m_edges[i]->GetVid(1) == m_verts[i]->GetGlobalID())
+        {
+            m_verts[i + 1] = m_edges[i]->GetVertex(0);
+        }
+        else
+        {
+            std::ostringstream errstrm;
+            errstrm << "Connected edges do not share a vertex. Edges ";
+            errstrm << m_edges[i]->GetGlobalID() << ", "
+                    << m_edges[i - 1]->GetGlobalID();
+            NEKERROR(ErrorUtil::efatal, errstrm.str());
+        }
+    }
+
+    // set up top vertices
+    // First, set up vertices 4,5
+    if ((m_edges[8]->GetVid(0) == m_edges[9]->GetVid(0)) ||
+        (m_edges[8]->GetVid(0) == m_edges[9]->GetVid(1)))
+    {
+        m_verts[4] = m_edges[8]->GetVertex(1);
+        m_verts[5] = m_edges[8]->GetVertex(0);
+    }
+    else if ((m_edges[8]->GetVid(1) == m_edges[9]->GetVid(0)) ||
+             (m_edges[8]->GetVid(1) == m_edges[9]->GetVid(1)))
+    {
+        m_verts[4] = m_edges[8]->GetVertex(0);
+        m_verts[5] = m_edges[8]->GetVertex(1);
+    }
+    else
+    {
+        std::ostringstream errstrm;
+        errstrm << "Connected edges do not share a vertex. Edges ";
+        errstrm << m_edges[8]->GetGlobalID() << ", "
+                << m_edges[9]->GetGlobalID();
+        NEKERROR(ErrorUtil::efatal, errstrm.str());
+    }
+
+    // set up the other top vertices (i.e. vertex 6,7)
+    for (i = 9; i < 11; i++)
+    {
+        if (m_edges[i]->GetVid(0) == m_verts[i - 4]->GetGlobalID())
+        {
+            m_verts[i - 3] = m_edges[i]->GetVertex(1);
+        }
+        else if (m_edges[i]->GetVid(1) == m_verts[i - 4]->GetGlobalID())
+        {
+            m_verts[i - 3] = m_edges[i]->GetVertex(0);
+        }
+        else
+        {
+            std::ostringstream errstrm;
+            errstrm << "Connected edges do not share a vertex. Edges ";
+            errstrm << m_edges[i]->GetGlobalID() << ", "
+                    << m_edges[i - 1]->GetGlobalID();
+            NEKERROR(ErrorUtil::efatal, errstrm.str());
+        }
+    }
+}
+
+void HexGeom::SetUpFaceOrientation()
+{
+    int f, i;
+
+    // These arrays represent the vector of the A and B
+    // coordinate of the local elemental coordinate system
+    // where A corresponds with the coordinate direction xi_i
+    // with the lowest index i (for that particular face)
+    // Coordinate 'B' then corresponds to the other local
+    // coordinate (i.e. with the highest index)
+    Array<OneD, NekDouble> elementAaxis(m_coordim);
+    Array<OneD, NekDouble> elementBaxis(m_coordim);
+
+    // These arrays correspond to the local coordinate
+    // system of the face itself (i.e. the Geometry2D)
+    // faceAaxis correspond to the xi_0 axis
+    // faceBaxis correspond to the xi_1 axis
+    Array<OneD, NekDouble> faceAaxis(m_coordim);
+    Array<OneD, NekDouble> faceBaxis(m_coordim);
+
+    // This is the base vertex of the face (i.e. the Geometry2D)
+    // This corresponds to thevertex with local ID 0 of the
+    // Geometry2D
+    unsigned int baseVertex;
+
+    // The lenght of the vectors above
+    NekDouble elementAaxis_length;
+    NekDouble elementBaxis_length;
+    NekDouble faceAaxis_length;
+    NekDouble faceBaxis_length;
+
+    // This 2D array holds the local id's of all the vertices
+    // for every face. For every face, they are ordered in such
+    // a way that the implementation below allows a unified approach
+    // for all faces.
+    const unsigned int faceVerts[kNfaces][QuadGeom::kNverts] = {
+        {0, 1, 2, 3}, {0, 1, 5, 4}, {1, 2, 6, 5},
+        {3, 2, 6, 7}, {0, 3, 7, 4}, {4, 5, 6, 7}};
+
+    NekDouble dotproduct1 = 0.0;
+    NekDouble dotproduct2 = 0.0;
+
+    unsigned int orientation;
+
+    // Loop over all the faces to set up the orientation
+    for (f = 0; f < kNqfaces + kNtfaces; f++)
+    {
+        // initialisation
+        elementAaxis_length = 0.0;
+        elementBaxis_length = 0.0;
+        faceAaxis_length    = 0.0;
+        faceBaxis_length    = 0.0;
+
+        dotproduct1 = 0.0;
+        dotproduct2 = 0.0;
+
+        baseVertex = m_faces[f]->GetVid(0);
+
+        // We are going to construct the vectors representing the A
+        // and B axis of every face. These vectors will be constructed
+        // as a vector-representation of the edges of the
+        // face. However, for both coordinate directions, we can
+        // represent the vectors by two different edges. That's why we
+        // need to make sure that we pick the edge to which the
+        // baseVertex of the Geometry2D-representation of the face
+        // belongs...
+        if (baseVertex == m_verts[faceVerts[f][0]]->GetGlobalID())
+        {
+            for (i = 0; i < m_coordim; i++)
+            {
+                elementAaxis[i] = (*m_verts[faceVerts[f][1]])[i] -
+                                  (*m_verts[faceVerts[f][0]])[i];
+                elementBaxis[i] = (*m_verts[faceVerts[f][3]])[i] -
+                                  (*m_verts[faceVerts[f][0]])[i];
+            }
+        }
+        else if (baseVertex == m_verts[faceVerts[f][1]]->GetGlobalID())
+        {
+            for (i = 0; i < m_coordim; i++)
+            {
+                elementAaxis[i] = (*m_verts[faceVerts[f][1]])[i] -
+                                  (*m_verts[faceVerts[f][0]])[i];
+                elementBaxis[i] = (*m_verts[faceVerts[f][2]])[i] -
+                                  (*m_verts[faceVerts[f][1]])[i];
+            }
+        }
+        else if (baseVertex == m_verts[faceVerts[f][2]]->GetGlobalID())
+        {
+            for (i = 0; i < m_coordim; i++)
+            {
+                elementAaxis[i] = (*m_verts[faceVerts[f][2]])[i] -
+                                  (*m_verts[faceVerts[f][3]])[i];
+                elementBaxis[i] = (*m_verts[faceVerts[f][2]])[i] -
+                                  (*m_verts[faceVerts[f][1]])[i];
+            }
+        }
+        else if (baseVertex == m_verts[faceVerts[f][3]]->GetGlobalID())
+        {
+            for (i = 0; i < m_coordim; i++)
+            {
+                elementAaxis[i] = (*m_verts[faceVerts[f][2]])[i] -
+                                  (*m_verts[faceVerts[f][3]])[i];
+                elementBaxis[i] = (*m_verts[faceVerts[f][3]])[i] -
+                                  (*m_verts[faceVerts[f][0]])[i];
+            }
+        }
+        else
+        {
+            NEKERROR(ErrorUtil::efatal,
+                     "Could not find matching vertex for the face");
+        }
+
+        // Now, construct the edge-vectors of the local coordinates of
+        // the Geometry2D-representation of the face
+        for (i = 0; i < m_coordim; i++)
+        {
+            faceAaxis[i] =
+                (*m_faces[f]->GetVertex(1))[i] - (*m_faces[f]->GetVertex(0))[i];
+            faceBaxis[i] =
+                (*m_faces[f]->GetVertex(3))[i] - (*m_faces[f]->GetVertex(0))[i];
+
+            elementAaxis_length += pow(elementAaxis[i], 2);
+            elementBaxis_length += pow(elementBaxis[i], 2);
+            faceAaxis_length += pow(faceAaxis[i], 2);
+            faceBaxis_length += pow(faceBaxis[i], 2);
+        }
+
+        elementAaxis_length = std::sqrt(elementAaxis_length);
+        elementBaxis_length = std::sqrt(elementBaxis_length);
+        faceAaxis_length    = std::sqrt(faceAaxis_length);
+        faceBaxis_length    = std::sqrt(faceBaxis_length);
+
+        // Calculate the inner product of both the A-axis
+        // (i.e. Elemental A axis and face A axis)
+        for (i = 0; i < m_coordim; i++)
+        {
+            dotproduct1 += elementAaxis[i] * faceAaxis[i];
+        }
+
+        NekDouble norm =
+            fabs(dotproduct1) / elementAaxis_length / faceAaxis_length;
+        orientation = 0;
+
+        // if the innerproduct is equal to the (absolute value of the ) products
+        // of the lengths of both vectors, then, the coordinate systems will NOT
+        // be transposed
+        if (fabs(norm - 1.0) < NekConstants::kNekZeroTol)
+        {
+            // if the inner product is negative, both A-axis point
+            // in reverse direction
+            if (dotproduct1 < 0.0)
+            {
+                orientation += 2;
+            }
+
+            // calculate the inner product of both B-axis
+            for (i = 0; i < m_coordim; i++)
+            {
+                dotproduct2 += elementBaxis[i] * faceBaxis[i];
+            }
+
+            norm = fabs(dotproduct2) / elementBaxis_length / faceBaxis_length;
+
+            // check that both these axis are indeed parallel
+            if (fabs(norm - 1.0) >= NekConstants::kNekZeroTol)
+            {
+                NEKERROR(ErrorUtil::ewarning,
+                         "These vectors should be parallel");
+            }
+
+            // if the inner product is negative, both B-axis point
+            // in reverse direction
+            if (dotproduct2 < 0.0)
+            {
+                orientation++;
+            }
+        }
+        // The coordinate systems are transposed
+        else
+        {
+            orientation = 4;
+
+            // Calculate the inner product between the elemental A-axis
+            // and the B-axis of the face (which are now the corresponding axis)
+            dotproduct1 = 0.0;
+            for (i = 0; i < m_coordim; i++)
+            {
+                dotproduct1 += elementAaxis[i] * faceBaxis[i];
+            }
+
+            norm = fabs(dotproduct1) / elementAaxis_length / faceBaxis_length;
+
+            // check that both these axis are indeed parallel
+            if (fabs(norm - 1.0) >= NekConstants::kNekZeroTol)
+            {
+                NEKERROR(ErrorUtil::ewarning,
+                         "These vectors should be parallel");
+            }
+
+            // if the result is negative, both axis point in reverse
+            // directions
+            if (dotproduct1 < 0.0)
+            {
+                orientation += 2;
+            }
+
+            // Do the same for the other two corresponding axis
+            dotproduct2 = 0.0;
+            for (i = 0; i < m_coordim; i++)
+            {
+                dotproduct2 += elementBaxis[i] * faceAaxis[i];
+            }
+
+            norm = fabs(dotproduct2) / elementBaxis_length / faceAaxis_length;
+
+            // check that both these axis are indeed parallel
+            if (fabs(norm - 1.0) >= NekConstants::kNekZeroTol)
+            {
+                NEKERROR(ErrorUtil::ewarning,
+                         "These vectors should be parallel");
+            }
+
+            if (dotproduct2 < 0.0)
+            {
+                orientation++;
+            }
+        }
+
+        orientation = orientation + 5;
+        // Fill the m_forient array
+        m_forient[f] = (StdRegions::Orientation)orientation;
+    }
+}
+
+void HexGeom::SetUpEdgeOrientation()
+{
+
+    // This 2D array holds the local id's of all the vertices
+    // for every edge. For every edge, they are ordered to what we
+    // define as being Forwards
+    const unsigned int edgeVerts[kNedges][2] = {{0, 1}, {1, 2}, {2, 3}, {3, 0},
+                                                {0, 4}, {1, 5}, {2, 6}, {3, 7},
+                                                {4, 5}, {5, 6}, {6, 7}, {7, 4}};
+
+    int i;
+    for (i = 0; i < kNedges; i++)
+    {
+        if (m_edges[i]->GetVid(0) == m_verts[edgeVerts[i][0]]->GetGlobalID())
+        {
+            m_eorient[i] = StdRegions::eForwards;
+        }
+        else if (m_edges[i]->GetVid(0) ==
+                 m_verts[edgeVerts[i][1]]->GetGlobalID())
+        {
+            m_eorient[i] = StdRegions::eBackwards;
+        }
+        else
+        {
+            NEKERROR(ErrorUtil::efatal,
+                     "Could not find matching vertex for the edge");
+        }
+    }
+}
+
+void HexGeom::v_Reset(CurveMap &curvedEdges, CurveMap &curvedFaces)
+{
+    Geometry::v_Reset(curvedEdges, curvedFaces);
+
+    for (int i = 0; i < 6; ++i)
+    {
+        m_faces[i]->Reset(curvedEdges, curvedFaces);
+    }
+
+    SetUpXmap();
+    SetUpCoeffs(m_xmap->GetNcoeffs());
+}
+
+void HexGeom::v_Setup()
+{
+    if (!m_setupState)
+    {
+        for (int i = 0; i < 6; ++i)
+        {
+            m_faces[i]->Setup();
+        }
+        SetUpXmap();
+        SetUpCoeffs(m_xmap->GetNcoeffs());
+
+        // check to see if expansions are linear
+        m_straightEdge = 1;
+        if (m_xmap->GetBasisNumModes(0) != 2 ||
+            m_xmap->GetBasisNumModes(1) != 2 ||
+            m_xmap->GetBasisNumModes(2) != 2)
+        {
+            m_straightEdge = 0;
+        }
+
+        m_setupState = true;
+    }
+}
+
+/**
+ * @brief Set up the #m_xmap object by determining the order of each
+ * direction from derived faces.
+ */
+void HexGeom::SetUpXmap()
+{
+    // Determine necessary order for standard region. This can almost certainly
+    // be simplified but works for now!
+    std::vector<int> tmp1;
+
+    if (m_forient[0] < 9)
+    {
+        tmp1.push_back(m_faces[0]->GetXmap()->GetTraceNcoeffs(0));
+        tmp1.push_back(m_faces[0]->GetXmap()->GetTraceNcoeffs(2));
+    }
+    else
+    {
+        tmp1.push_back(m_faces[0]->GetXmap()->GetTraceNcoeffs(1));
+        tmp1.push_back(m_faces[0]->GetXmap()->GetTraceNcoeffs(3));
+    }
+
+    if (m_forient[5] < 9)
+    {
+        tmp1.push_back(m_faces[5]->GetXmap()->GetTraceNcoeffs(0));
+        tmp1.push_back(m_faces[5]->GetXmap()->GetTraceNcoeffs(2));
+    }
+    else
+    {
+        tmp1.push_back(m_faces[5]->GetXmap()->GetTraceNcoeffs(1));
+        tmp1.push_back(m_faces[5]->GetXmap()->GetTraceNcoeffs(3));
+    }
+
+    int order0 = *std::max_element(tmp1.begin(), tmp1.end());
+
+    tmp1.clear();
+
+    if (m_forient[0] < 9)
+    {
+        tmp1.push_back(m_faces[0]->GetXmap()->GetTraceNcoeffs(1));
+        tmp1.push_back(m_faces[0]->GetXmap()->GetTraceNcoeffs(3));
+    }
+    else
+    {
+        tmp1.push_back(m_faces[0]->GetXmap()->GetTraceNcoeffs(0));
+        tmp1.push_back(m_faces[0]->GetXmap()->GetTraceNcoeffs(2));
+    }
+
+    if (m_forient[5] < 9)
+    {
+        tmp1.push_back(m_faces[5]->GetXmap()->GetTraceNcoeffs(1));
+        tmp1.push_back(m_faces[5]->GetXmap()->GetTraceNcoeffs(3));
+    }
+    else
+    {
+        tmp1.push_back(m_faces[5]->GetXmap()->GetTraceNcoeffs(0));
+        tmp1.push_back(m_faces[5]->GetXmap()->GetTraceNcoeffs(2));
+    }
+
+    int order1 = *std::max_element(tmp1.begin(), tmp1.end());
+
+    tmp1.clear();
+
+    if (m_forient[1] < 9)
+    {
+        tmp1.push_back(m_faces[1]->GetXmap()->GetTraceNcoeffs(1));
+        tmp1.push_back(m_faces[1]->GetXmap()->GetTraceNcoeffs(3));
+    }
+    else
+    {
+        tmp1.push_back(m_faces[1]->GetXmap()->GetTraceNcoeffs(0));
+        tmp1.push_back(m_faces[1]->GetXmap()->GetTraceNcoeffs(2));
+    }
+
+    if (m_forient[3] < 9)
+    {
+        tmp1.push_back(m_faces[3]->GetXmap()->GetTraceNcoeffs(1));
+        tmp1.push_back(m_faces[3]->GetXmap()->GetTraceNcoeffs(3));
+    }
+    else
+    {
+        tmp1.push_back(m_faces[3]->GetXmap()->GetTraceNcoeffs(0));
+        tmp1.push_back(m_faces[3]->GetXmap()->GetTraceNcoeffs(2));
+    }
+
+    int order2 = *std::max_element(tmp1.begin(), tmp1.end());
+
+    std::array<LibUtilities::BasisKey, 3> basis = {
+        LibUtilities::BasisKey(
+            LibUtilities::eModified_A, order0,
+            LibUtilities::PointsKey(order0 + 1,
+                                    LibUtilities::eGaussLobattoLegendre)),
+        LibUtilities::BasisKey(
+            LibUtilities::eModified_A, order1,
+            LibUtilities::PointsKey(order1 + 1,
+                                    LibUtilities::eGaussLobattoLegendre)),
+        LibUtilities::BasisKey(
+            LibUtilities::eModified_A, order2,
+            LibUtilities::PointsKey(order2 + 1,
+                                    LibUtilities::eGaussLobattoLegendre))};
+
+    m_xmap = GetStdHexFactory().CreateInstance(basis);
+}
+
+/**
+ * @brief Put all quadrature information into face/edge structure and
+ * backward transform.
+ *
+ * Note verts, edges, and faces are listed according to anticlockwise
+ * convention but points in _coeffs have to be in array format from left
+ * to right.
+ */
+void HexGeom::v_FillGeom()
+{
+    if (m_state == ePtsFilled)
+    {
+        return;
+    }
+
+    int i, j, k;
+
+    for (i = 0; i < kNfaces; i++)
+    {
+        m_faces[i]->FillGeom();
+
+        int nFaceCoeffs = m_faces[i]->GetXmap()->GetNcoeffs();
+
+        Array<OneD, unsigned int> mapArray(nFaceCoeffs);
+        Array<OneD, int> signArray(nFaceCoeffs);
+
+        if (m_forient[i] < 9)
+        {
+            m_xmap->GetTraceToElementMap(
+                i, mapArray, signArray, m_forient[i],
+                m_faces[i]->GetXmap()->GetTraceNcoeffs(0),
+                m_faces[i]->GetXmap()->GetTraceNcoeffs(1));
+        }
+        else
+        {
+            m_xmap->GetTraceToElementMap(
+                i, mapArray, signArray, m_forient[i],
+                m_faces[i]->GetXmap()->GetTraceNcoeffs(1),
+                m_faces[i]->GetXmap()->GetTraceNcoeffs(0));
+        }
+
+        for (j = 0; j < m_coordim; j++)
+        {
+            const Array<OneD, const NekDouble> &coeffs =
+                m_faces[i]->GetCoeffs(j);
+
+            for (k = 0; k < nFaceCoeffs; k++)
+            {
+                NekDouble v              = signArray[k] * coeffs[k];
+                m_coeffs[j][mapArray[k]] = v;
+            }
+        }
+    }
+
+    m_state = ePtsFilled;
+}
+
+} // namespace Nektar::SpatialDomains

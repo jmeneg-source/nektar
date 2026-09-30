@@ -1,0 +1,25 @@
+--- ThirdParty/png/vtkpng/pngpriv.h	2026-05-08 18:34:26.768067799 +0100
++++ ThirdParty/png/vtkpng/pngpriv.h	2026-05-08 18:36:26.381181956 +0100
+@@ -528,8 +528,10 @@
+     * as it seems it doesn't agree with <fp.h>, yet we should really use
+     * <fp.h> if possible.
+     */
+-#    if !defined(__MATH_H__) && !defined(__MATH_H) && !defined(__cmath__)
++#    if __has_include (<fp.h>)
+ #      include <fp.h>
++#    else
++#      include <math.h>
+ #    endif
+ #  else
+ #    include <math.h>
+--- Utilities/octree/octree/octree_node.txx	2026-05-08 18:56:30.956423735 +0100
++++ Utilities/octree/octree/octree_node.txx	2026-05-08 19:15:58.795337307 +0100
+@@ -210,7 +210,7 @@
+   {
+     throw std::domain_error("Attempt to access children of an octree leaf node.");
+   }
+-  return this->_M_chilren[child];
++  return this->m_children[child];
+ }
+ 
+ /**\brief Return a reference to a child node.

@@ -1,0 +1,8 @@
+--- arpack-ng-1.0/CMakeLists.txt	2026-06-04 01:05:44.908021870 +0100
++++ arpack-ng-1.0/CMakeLists.txt	2026-06-04 01:05:44.908021870 +0100
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 2.8.6)
++cmake_minimum_required(VERSION 3.5)
+ 
+ if (NOT DEFINED CMAKE_BUILD_TYPE)
+    set (CMAKE_BUILD_TYPE Release CACHE STRING "Build type")

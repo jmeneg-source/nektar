@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<NEKTAR>
+    <EXPANSIONS>
+        <E COMPOSITE="C[5]" NUMMODES="2" TYPE="MODIFIED" FIELDS="u,v,w,theta,p" />
+    </EXPANSIONS>
+
+    <CONDITIONS>
+
+        <SOLVERINFO>
+            <I PROPERTY="SolverType"                    VALUE="VelocityCorrectionScheme"/>
+            <I PROPERTY="EQTYPE"                        VALUE="UnsteadyNavierStokes"    />
+            <I PROPERTY="EvolutionOperator"             VALUE="Nonlinear"               />
+            <I PROPERTY="Projection"                    VALUE="Galerkin"                />
+            <I PROPERTY="GlobalSysSoln"                 VALUE="IterativeStaticCond"     />
+            <I PROPERTY="Driver"                        VALUE="Standard"                />
+            <I PROPERTY="SpectralHPDealiasing"          VALUE="True"                    />
+            <I PROPERTY="Homogeneous"                   VALUE="1D"                      />
+        </SOLVERINFO>
+
+        <TIMEINTEGRATIONSCHEME>
+            <METHOD> IMEX </METHOD>
+            <ORDER> 2 </ORDER>
+        </TIMEINTEGRATIONSCHEME>
+
+        <PARAMETERS>
+            <!-- Need to pick Delta t strategically, dont want CFL number to be too large! -->
+            <P> TimeStep       = 0.01             </P>
+
+            <!--  Final time -->
+            <P> TFinal         = 0.00             </P>
+            <P> NumSteps       = TFinal/TimeStep  </P>
+            <P> IO_InfoSteps   = 1/TimeStep       </P>
+            <P> IO_CFLSteps    = 1/TimeStep	      </P>
+
+            <!-- Reynolds number -->
+            <P> Pr             = 1                </P>
+            <P> Kinvis         = Pr               </P>
+
+            <P> HomModesZ      = 8                </P>
+            <P> LZ             = PI               </P>
+
+            <!-- Heating parameters  -->
+            <P> Ra            = 0                 </P>
+
+            <P> kdim          = 512               </P>
+            <P> nvec          = 2                 </P>
+            <P> evtol         = 1e-6              </P>
+
+        </PARAMETERS>
+
+        <VARIABLES>
+            <V ID="0">u</V>
+            <V ID="1">v</V>
+            <V ID="2">w</V>
+            <V ID="3">theta</V>
+            <V ID="4">p</V>
+        </VARIABLES>
+
+        <BOUNDARYREGIONS>
+            <B ID="0"> C[1]   </B>   <!-- Inlet    -->
+            <B ID="1"> C[2]   </B>   <!-- Outlet    -->
+            <B ID="2"> C[3]   </B>   <!-- UWall    -->
+            <B ID="3"> C[4]   </B>   <!-- Lwall    -->
+        </BOUNDARYREGIONS>
+
+        <BOUNDARYCONDITIONS>
+            <REGION REF="0">
+                <P VAR="u"  VALUE="[1]" />
+                <P VAR="v" VALUE="[1]" />
+                <P VAR="w" VALUE="[1]" />
+                <P VAR="theta" VALUE="[1]" />
+                <P VAR="p" VALUE="[1]" />
+            </REGION>
+            <REGION REF="1">
+                <P VAR="u" VALUE="[0]" />
+                <P VAR="v" VALUE="[0]" />
+                <P VAR="w" VALUE="[0]" />
+                <P VAR="theta" VALUE="[0]" />
+                <P VAR="p" VALUE="[0]" />
+            </REGION>
+            <REGION REF="2">
+                <D VAR="u"     VALUE="cos(2*PI*z / LZ)" />
+                <D VAR="v"     VALUE="cos(2*PI*z / LZ)" />
+                <D VAR="w"     VALUE="cos(2*PI*z / LZ)" />
+                <D VAR="theta" VALUE="cos(2*PI*z / LZ)" />
+                <N VAR="p" VALUE="0" USERDEFINEDTYPE="H" />
+            </REGION>
+            <REGION REF="3">
+                <D VAR="u"     VALUE="cos(2*PI*z / LZ)" />
+                <D VAR="v"     VALUE="cos(2*PI*z / LZ)" />
+                <D VAR="w"     VALUE="cos(2*PI*z / LZ)" />
+                <D VAR="theta" VALUE="cos(2*PI*z / LZ)" />
+                <N VAR="p" VALUE="0" USERDEFINEDTYPE="H" />
+            </REGION>
+
+        </BOUNDARYCONDITIONS>
+        <FUNCTION NAME="DiffusionCoefficient" >
+            <E VAR="theta" VALUE="1" />
+        </FUNCTION>
+
+        <FUNCTION NAME="BodyForce">
+            <E VAR="u"     VALUE="0"                 EVARS="u v w theta" />
+            <E VAR="w"     VALUE="0"                 EVARS="u v w theta" />
+            <E VAR="v"     VALUE="Ra * theta * Pr"   EVARS="u v w theta" />
+            <E VAR="theta" VALUE="0"                 EVARS="u v w theta"/>
+        </FUNCTION>
+
+        <FUNCTION NAME="InitialConditions">
+            <E VAR="u"          VALUE="cos(2*PI*z / LZ)" />
+            <E VAR="v"          VALUE="cos(2*PI*z / LZ)" />
+            <E VAR="w"          VALUE="cos(2*PI*z / LZ)" />
+            <E VAR="theta"      VALUE="cos(2*PI*z / LZ)"/>
+            <E VAR="p"          VALUE="0" />
+        </FUNCTION>
+
+    </CONDITIONS>
+
+    <FORCING>
+        <FORCE TYPE="Body">
+            <BODYFORCE>BodyForce</BODYFORCE>
+        </FORCE>
+    </FORCING>
+
+    <FILTERS>
+        <FILTER TYPE="Error">
+            <PARAM NAME="OutputFile">L2File</PARAM>
+            <PARAM NAME="OutputFrequency">1</PARAM>
+            <PARAM NAME="ConsoleOutput">1</PARAM>
+        </FILTER>
+    </FILTERS>
+    <GEOMETRY DIM="2" SPACE="2">
+        <VERTEX COMPRESSED="B64Z-LittleEndian" BITSIZE="64">eJxjYMAGPuyHsRihtISuS8hvRU4HdHkm7PL2MHlm7ObD5QGhKgpH</VERTEX>
+        <EDGE COMPRESSED="B64Z-LittleEndian" BITSIZE="64">eJxjYIAARgZUAOMz4eAz4+AzoPEBAzAAEwAA</EDGE>
+        <ELEMENT>
+            <Q COMPRESSED="B64Z-LittleEndian" BITSIZE="64">eJxjYEAFjFCaCUozQ2kAAHgABwAA</Q>
+        </ELEMENT>
+        <COMPOSITE>
+            <C ID="1"> E[3] </C>
+            <C ID="2"> E[1] </C>
+            <C ID="3"> E[2] </C>
+            <C ID="4"> E[0] </C>
+            <C ID="5"> Q[0] </C>
+        </COMPOSITE>
+        <DOMAIN>
+            <D ID="0"> C[5] </D>
+        </DOMAIN>
+    </GEOMETRY>
+    <Metadata>
+        <Provenance>
+            <GitBranch>refs/heads/fix/ImportFldSinglemodeExpansion</GitBranch>
+            <GitSHA1>45028fc647d421db87fb98b666286855b3fa9946</GitSHA1>
+            <Hostname>chanbuntu</Hostname>
+            <NektarVersion>5.3.0</NektarVersion>
+            <Timestamp>17-May-2023 16:29:20</Timestamp>
+        </Provenance>
+        <NekMeshCommandLine>-m peralign:surf1=1:surf2=2:dir=x Nx1-Ny1-Lx1.xml Nx1-Ny1-Lx1.xml </NekMeshCommandLine>
+    </Metadata>
+</NEKTAR>

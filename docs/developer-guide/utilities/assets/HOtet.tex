@@ -1,0 +1,47 @@
+\newcommand{\nodeLabel}[3]{
+    \node[color=#3, fill=white] at (#1) {\fontsize{10}{10}\selectfont #2}
+}
+
+\newcommand{\drawEdge}[3]{%
+  \draw[->, color=red, thick] 
+    ($ (#1)!0.1!(#2) $)  -- ($ (#2)!0.1!(#1) $);
+  \nodeLabel{$(#1)!0.5!(#2)$}{#3}{red}
+}
+
+\newcommand{\drawTriFace}[5]{
+    \coordinate (midMid) at ($  ($(#1) !0.5! (#2)$)  !0.33!  (#3)  $);
+    \coordinate (l0) at ($ (#1) !#5! (midMid) $);
+    \coordinate (l1) at ($ (#2) !#5! (midMid) $);
+    \coordinate (l2) at ($ (#3) !#5! (midMid) $);
+    \coordinate (l3) at ($ (l2) !0.33! (l0) $);
+    \node[color=blue] at (midMid) {\fontsize{10}{10}\selectfont #4};
+    \draw[->, color=blue, thick] (l0) -- (l1) -- (l2) -- (l3)
+}
+
+\tdplotsetmaincoords{63}{63}
+
+\begin{tikzpicture}[line join=bevel,tdplot_main_coords,scale=2.2,>=latex]
+  \coordinate (A) at (-1.5,-1.5,-1.5);
+  \coordinate (B) at ( 1.5,-1.5,-1.5);
+  \coordinate (C) at (0, 1.5,-1.5);
+  \coordinate (D) at (0,-0.5, 1.5);
+
+  \draw[dashed,opacity=0.5] (A) -- (C);
+  \drawTriFace{A}{B}{C}{0}{0.3};
+  \drawEdge{A}{C}{2};
+  \drawTriFace{A}{B}{D}{1}{0.6};
+  \draw (A) -- (B) -- (D) -- cycle;
+  \drawTriFace{B}{C}{D}{2}{0.5};
+  \drawTriFace{A}{C}{D}{3}{0.3};
+  \draw (B) -- (C) -- (D);
+  \drawEdge{A}{B}{0};
+  \drawEdge{B}{C}{1};
+  \drawEdge{A}{D}{3};
+  \drawEdge{B}{D}{4};
+  \drawEdge{C}{D}{5};
+  \nodeLabel{A}{0}{black};
+  \nodeLabel{B}{1}{black};
+  \nodeLabel{C}{2}{black};
+  \nodeLabel{D}{3}{black};
+
+\end{tikzpicture}

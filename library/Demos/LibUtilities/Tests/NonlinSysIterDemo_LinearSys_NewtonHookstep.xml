@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<NEKTAR xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://www.nektar.info/schema/nektar.xsd">
+
+    <CONDITIONS>
+        <SOLVERINFO>
+            <I PROPERTY="NonlinearSolver" VALUE="NewtonHookStep" />
+            <I PROPERTY="LinSysIterSolver"   VALUE="GMRES"/>
+        </SOLVERINFO>
+        <PARAMETERS>
+            <P> NonlinIterTolRelativeL2 = 1e-8 </P>
+            <P> LinSysMaxStorage = 2 </P>
+            <P> NekNonlinSysMaxIterations = 20 </P>
+
+            <P> TrustRadiusInit          = 1.0e-2 </P>
+            <P> TrustRadiusMin           = 1.0e-8 </P>
+            <P> TrustRadiusMax           = 1.0e0  </P>
+
+            <P> TrustRegionRhoAccept     = 1.0e-1 </P>
+            <P> TrustRegionRhoShrink     = 2.5e-1 </P>
+            <P> TrustRegionRhoGrow       = 7.5e-1 </P>
+            <P> TrustRegionShrinkFactor  = 0.5    </P>
+            <P> TrustRegionGrowFactor    = 2.0    </P>
+
+            <P> MaxTrustRegionSteps      = 4      </P>
+            <P> MaxTrustRegionGrowthSteps = 3 </P>
+            <P> TrustRegionMaxFallbackResidualGrowth = 10.0 </P>
+
+            <P> LinSysMaxStorage         = 1000   </P>
+
+            <P> MeaningfulAredRel = 1.0e-3 </P>
+            <P> MeaningfulAredAbs = 1.0e-12 </P>
+        </PARAMETERS>
+        <VARIABLES>
+            <V ID="0"> u </V>
+        </VARIABLES>
+
+    </CONDITIONS>
+</NEKTAR>

@@ -1,0 +1,76 @@
+\newcommand{\nodeLabel}[3]{
+    \node[color=#3, fill=white, opacity=0.9] at (#1) {\fontsize{14}{14}\selectfont #2}
+}
+
+\tdplotsetmaincoords{70}{20}
+\begin{tikzpicture}[line join=bevel,tdplot_main_coords,scale=2,>=latex]
+  \coordinate (A) at (-1,-1,-1);
+  \coordinate (B) at ( 1,-1,-1);
+  \coordinate (C) at ( 1, 1,-1);
+  \coordinate (D) at (-1, 1,-1);
+  \coordinate (E) at (0, 0, 1);
+  
+  \coordinate (A') at (2,-1,-1);
+  \coordinate (B') at (4,-1,-1);
+  \coordinate (C') at (4, 1,-1);
+  \coordinate (D') at (2, 1,-1);
+  \coordinate (E') at (3, 0, 1);
+
+  \coordinate (U) at (-1,0,-2.5);
+  \coordinate (V) at (1,0,-2.5);
+  \coordinate (W) at (2,0,-2.5);
+  \coordinate (X) at (4,0,-2.5);
+  
+  \coordinate (el0) at (0,   0, -0.2);  % pyr 
+  \coordinate (el1) at (3,   0, -0.2);  % pyr
+  \coordinate (el2) at (1.5, 0, -0.2);  % pris
+  \coordinate (el3) at (0,   0, -1.75); % pris 
+  \coordinate (el4) at (3,   0, -1.75); % pris
+  \coordinate (el5) at (1.5, 0, -1.75); % pris
+  
+  \draw (A) -- (B) -- (E) -- cycle;
+  \draw[dashed,opacity=0.5] (B) -- (C) -- (E) -- cycle;
+  \draw[dashed,opacity=0.5] (C) -- (D) -- (A);
+  \draw[dashed,opacity=0.5] (D) -- (E);
+  
+  \draw (B) -- (A');
+  \draw[dashed,opacity=0.5] (C) -- (D');
+  \draw (E) -- (E');
+
+  \draw (A') -- (B') -- (E') -- cycle;
+  \draw (B') -- (C') -- (E') -- cycle;
+  \draw[dashed,opacity=0.5] (C') -- (D') -- (A');
+  \draw[dashed,opacity=0.5] (D') -- (E');
+
+  \draw (A) -- (U) -- (V) -- (B);
+  \draw (A') -- (W) -- (X) -- (B');
+  \draw (V) -- (W);
+  \draw (X) -- (C');
+  \draw[dashed,opacity=0.5] (U) -- (D);
+  \draw[dashed,opacity=0.5] (V) -- (C);
+  \draw[dashed,opacity=0.5] (W) -- (D');
+
+  % \nodeLabel{E} {E} {red};
+  % \nodeLabel{E'}{E'}{red};
+  % \nodeLabel{A} {A} {red};
+  % \nodeLabel{B} {B} {red};
+  % \nodeLabel{C} {C} {red};
+  % \nodeLabel{D} {D} {red};
+  % \nodeLabel{A'}{A'}{red};
+  % \nodeLabel{B'}{B'}{red};
+  % \nodeLabel{C'}{C'}{red};
+  % \nodeLabel{D'}{D'}{red};
+  % \nodeLabel{U} {U} {red};
+  % \nodeLabel{V} {V} {red};
+  % \nodeLabel{W} {W} {red};
+  % \nodeLabel{X} {X} {red};
+
+  \nodeLabel{el0}{0}{blue};
+  \nodeLabel{el1}{1}{blue};
+  \nodeLabel{el2}{2}{blue};
+  \nodeLabel{el3}{3}{blue};
+  \nodeLabel{el4}{4}{blue};
+  \nodeLabel{el5}{5}{blue};
+  
+  
+\end{tikzpicture}
