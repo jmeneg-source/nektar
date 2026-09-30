@@ -1,5 +1,13 @@
 Changelog
 =========
+v5.11.0
+------
+**PEMFCSolver**
+- New solver for species transport and electrochemistry in PEM fuel cells: PEMFCSpecies, PEMFCSteady, PEMFCCathodeMS and PEMFCMultilayer equation systems, user-guide chapter and regression test
+
+**IncNavierStokesSolver**
+- New VCSImplicitAbsorption solver type: velocity correction scheme with an implicit, spatially varying absorption (Brinkman penalization) term
+
 v5.10.0
 ------
 **Library**

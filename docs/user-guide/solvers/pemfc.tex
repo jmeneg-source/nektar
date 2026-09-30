@@ -1,0 +1,126 @@
+\chapter{PEM Fuel Cell Solver}
+\label{s:pemfc}
+
+\section{Synopsis}
+
+The PEMFCSolver simulates species transport and electrochemistry in
+proton exchange membrane (PEM) fuel cells on two-dimensional
+channel-plane domains. Channel and rib layouts are represented on a
+fixed mesh through Brinkman penalization, so no remeshing is needed
+when the layout changes; this also makes the solver directly usable
+in density-based topology optimization workflows. The flow field is
+computed separately by the IncNavierStokesSolver, using the
+\inltt{VCSImplicitAbsorption} solver type described below, and is
+passed to the species solver as a field file.
+
+The solver family covers the following equation types.
+
+\begin{table}[h!]
+\begin{center}
+\small
+\renewcommand\arraystretch{1.6}
+\begin{tabular}{lp{8.5cm}}
+\toprule
+\textbf{EquationType} & \textbf{Description} \\
+\midrule
+\inltt{PEMFCSpecies} & Unsteady advection-diffusion of oxygen with a
+nonlinear Butler-Volmer sink, IMEX time integration; the local
+current density is resolved pointwise by a safeguarded Newton
+iteration and written to output as a derived field. \\
+\inltt{PEMFCSteady} & Steady counterpart: Picard (secant) iteration
+in which the Butler-Volmer sink is linearized about the previous
+iterate; each iterate is one variable-coefficient steady
+advection-diffusion-reaction solve. \\
+\inltt{PEMFCCathodeMS} & Steady cathode multi-species system
+(oxygen and water vapor, nitrogen closing the mixture) with local
+mixture diffusivities, a derived water source ratio and an optional
+Stefan correction. \\
+\inltt{PEMFCMultilayer} & Steady multilayer (section-slice) system:
+several stacked physical layers collapsed onto one 2D mesh, coupled
+by volumetric inter-layer exchange terms, with a pointwise
+two-electrode kinetics closure. \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+In addition, the incompressible Navier-Stokes solver gains the
+solver type \inltt{VCSImplicitAbsorption}: a velocity correction
+scheme in which a spatially varying absorption (Brinkman) term
+$-\sigma(\mathbf{x})\,\mathbf{u}$ is treated implicitly inside the
+velocity Helmholtz solves. This removes the explicit-forcing
+stability restriction $\sigma \Delta t \lesssim 1$, which is severe
+at realistic penalization strengths ($\sigma \sim 10^6$~s$^{-1}$).
+
+\section{Usage}
+
+\begin{lstlisting}[style=BashInputStyle]
+PEMFCSolver session.xml
+\end{lstlisting}
+
+The flow field is computed first, for example
+\begin{lstlisting}[style=BashInputStyle]
+IncNavierStokesSolver mesh.xml flow.xml
+\end{lstlisting}
+with \inltt{SolverType} set to \inltt{VCSImplicitAbsorption} and the
+absorption coefficient given by the \inltt{ImplicitAbsorption}
+function. The converged velocity is then supplied to the species
+session through the \inltt{AdvectionVelocity} function with a
+\inltt{FILE} attribute.
+
+\section{Session file configuration}
+
+\subsection{Solver info}
+
+\begin{itemize}
+\item \inltt{EqType}: one of the equation types listed above.
+\item \inltt{Projection}: \inltt{Continuous} (the solver family is
+formulated for continuous Galerkin projections).
+\end{itemize}
+
+\subsection{Parameters}
+
+The main physical parameters of the steady cathode solvers:
+
+\begin{itemize}
+\item \inltt{epsilon}: effective diffusivity of the transported
+species.
+\item \inltt{Htot}: total out-of-plane height entering the
+volumetric sink.
+\item \inltt{Vcell}: cell voltage.
+\item \inltt{Rlump}: lumped area-specific resistance of the
+Butler-Volmer closure.
+\item \inltt{i0}: exchange current density.
+\item \inltt{WaterSourceRatio}: mass ratio of the net water source
+to the oxygen sink (\inltt{PEMFCCathodeMS}).
+\item \inltt{StefanCorrection}: set to 1 to enable the Stefan flow
+correction of the diffusive fluxes (\inltt{PEMFCCathodeMS}).
+\item \inltt{PicardIters}, \inltt{PicardTol}, \inltt{PicardRelax}:
+outer iteration controls of the steady solvers.
+\end{itemize}
+
+\subsection{Functions}
+
+\begin{itemize}
+\item \inltt{AdvectionVelocity}: the advecting velocity, normally
+read from a field file produced by the flow solve.
+\item \inltt{DiffusivityFactor}: spatially varying factor applied to
+the diffusivity, used to distinguish channel and rib regions.
+\item \inltt{ImplicitAbsorption} (flow sessions): the absorption
+coefficient $\sigma(\mathbf{x})$ of
+\inltt{VCSImplicitAbsorption}.
+\end{itemize}
+
+Note for sessions written for Nektar++ 5.0: the flow sessions must
+use the \inltt{TIMEINTEGRATIONSCHEME} block (for example method
+\inltt{IMEX} of order 2) instead of the removed
+\inltt{TimeIntegrationMethod} solver-info property.
+
+\section{Examples}
+
+The regression test in \inlsh{solvers/PEMFCSolver/Tests} solves a
+cathode two-species configuration on a coarse mesh of the parallel
+flow field verification case of the solver publication: flow through
+a penalized channel-rib layout, oxygen and water-vapor transport,
+and Butler-Volmer kinetics with a Picard steady iteration. The
+converged fields reproduce the published verification values.

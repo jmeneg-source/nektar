@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  Case 04f, gate (a) DEGENERATE CHECK: PEMFCCathodeMS with equal binary
+  diffusivities and StefanCorrection=0 must reproduce PEMFCSteady with
+  DilutionMassRatio = 2.375 (coarse reference: min wO2 0.1324,
+  mean iloc 2255, case 04d sweep outE_rd2.375).
+-->
+<NEKTAR>
+  <EXPANSIONS>
+    <E COMPOSITE="C[0]" NUMMODES="4" TYPE="MODIFIED" FIELDS="wO2,wH2O" />
+  </EXPANSIONS>
+
+  <CONDITIONS>
+    <SOLVERINFO>
+      <I PROPERTY="EQTYPE"     VALUE="PEMFCCathodeMS" />
+      <I PROPERTY="Projection" VALUE="Continuous" />
+    </SOLVERINFO>
+
+    <PARAMETERS>
+      <P> epsilon     = 2.67e-5 </P>
+      <P> rho         = 1.0     </P>
+      <P> Htot        = 1.38e-3 </P>
+      <P> Vcell       = 0.4     </P>
+      <P> WaterSourceRatio = 3.375 </P>
+      <P> StefanCorrection = 0  </P>
+      <P> DO2H2O      = 1.0e-5  </P>
+      <P> DO2N2       = 1.0e-5  </P>
+      <P> DN2H2O      = 1.0e-5  </P>
+      <P> PicardIters = 12      </P>
+      <P> PicardTol   = 1e-6    </P>
+      <P> PicardRelax = 1.0     </P>
+    </PARAMETERS>
+
+    <VARIABLES>
+      <V ID="0"> wO2 </V>
+      <V ID="1"> wH2O </V>
+    </VARIABLES>
+
+    <BOUNDARYREGIONS>
+      <B ID="0"> C[1] </B> <!-- inlet -->
+      <B ID="1"> C[2] </B> <!-- outlet -->
+      <B ID="2"> C[3] </B> <!-- symmetry -->
+      <B ID="3"> C[4] </B> <!-- walls -->
+    </BOUNDARYREGIONS>
+
+    <BOUNDARYCONDITIONS>
+      <REGION REF="0">
+        <D VAR="wO2"  VALUE="0.228" />
+        <D VAR="wH2O" VALUE="0.0236" />
+      </REGION>
+      <REGION REF="1">
+        <N VAR="wO2"  VALUE="0" />
+        <N VAR="wH2O" VALUE="0" />
+      </REGION>
+      <REGION REF="2">
+        <N VAR="wO2"  VALUE="0" />
+        <N VAR="wH2O" VALUE="0" />
+      </REGION>
+      <REGION REF="3">
+        <N VAR="wO2"  VALUE="0" />
+        <N VAR="wH2O" VALUE="0" />
+      </REGION>
+    </BOUNDARYCONDITIONS>
+
+    <FUNCTION NAME="DiffusivityFactor">
+      <E VAR="wO2" VALUE="0.92167 - (0.92167-0.19703)*((x>0.6e-3)*(x&lt;2.018e-3) + (x>3.218e-3)*(x&lt;4.636e-3) + (x>5.836e-3)*(x&lt;7.254e-3) + (x>8.454e-3)*(x&lt;9.98e-3))*(y>1.8e-3)*(y&lt;20.56e-3)" />
+    </FUNCTION>
+
+    <FUNCTION NAME="AdvectionVelocity">
+      <F VAR="Vx,Vy" FILE="velocity.fld" />
+    </FUNCTION>
+  </CONDITIONS>
+</NEKTAR>
